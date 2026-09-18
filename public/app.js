@@ -95,7 +95,7 @@ async function homePage(){
     <div class="matches dashboard-matches">${m.map((x,i)=>`<div class="card match match-large">
       <div class="match-top"><span class="badge">${i<2?"HOT":"FEATURED"}</span><span class="time">${x.time}</span></div>
       <div class="league">FOOTBALL</div>
-      <div class="teams"><div class="team"><img class="logo" src="${x.homeLogo}" onerror="this.style.opacity=.2">${x.home}</div><div class="vs">VS</div><div class="team"><img class="logo" src="${x.awayLogo}" onerror="this.style.opacity=.2">${x.away}</div></div>
+      <div class="teams"><div class="team"><img class="logo" src="${x.homeLogo}" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='https://upload.wikimedia.org/wikipedia/commons/8/8d/FC_Bayern_M%C3%BCnchen_logo_%282024%29.svg'}else{this.style.display='none'}">${x.home}</div><div class="vs">VS</div><div class="team"><img class="logo" src="${x.awayLogo}" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='https://upload.wikimedia.org/wikipedia/commons/8/8d/FC_Bayern_M%C3%BCnchen_logo_%282024%29.svg'}else{this.style.display='none'}">${x.away}</div></div>
       <div class="match-bottom"><span>Today's fixture</span><span class="green-dot"></span></div>
     </div>`).join("")}</div>
    </section>

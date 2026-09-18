@@ -149,7 +149,7 @@ app.get("/api/hot-matches",(req,res)=>res.json([
   {home:"Real Madrid",away:"Barcelona",time:"20:00",homeLogo:"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",awayLogo:"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg"},
   {home:"Arsenal",away:"Liverpool",time:"18:30",homeLogo:"https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",awayLogo:"https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg"},
   {home:"Inter Milan",away:"AC Milan",time:"21:00",homeLogo:"https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",awayLogo:"https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg"},
-  {home:"Bayern Munich",away:"Dortmund",time:"19:30",homeLogo:"https://upload.wikimedia.org/wikipedia/en/1/1f/FC_Bayern_Munich_logo_%282017%29.svg",awayLogo:"https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg"}
+  {home:"Bayern Munich",away:"Dortmund",time:"19:30",homeLogo:"https://upload.wikimedia.org/wikipedia/commons/8/8d/FC_Bayern_M%C3%BCnchen_logo_%282024%29.svg",awayLogo:"https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg"}
 ]));
 
 app.get("/api/slips",(req,res)=>{
