@@ -20,7 +20,10 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-const db = new Database(path.join(__dirname, "data", "edm.sqlite"));
+const dataDir = path.join(__dirname, "data");
+import fs from "node:fs";
+fs.mkdirSync(dataDir, { recursive: true });
+const db = new Database(path.join(dataDir, "edm.sqlite"));
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
 
