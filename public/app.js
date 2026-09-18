@@ -34,9 +34,51 @@ function authPage(mode){
 }
 async function homePage(){
  const [m,s]=await Promise.all([api("/api/hot-matches"),api("/api/slips")]);
- app.innerHTML=`<div class="container"><div class="hero"><div><div class="eyebrow">TODAY'S HOT MATCHES</div><h1>HATUNA NAMNA,<br><span>HATUNA MADUKA.</span></h1><p>Follow the fixtures, then explore EDM's premium slip catalogue. Picks stay server-side until a verified purchase exists.</p><div class="smart">Bet Smart Win Bigger</div></div><div class="stats"><div class="stat"><b>${s.slips.length}</b><span>ACTIVE PREMIUM SLIPS</span></div><div class="stat"><b>24/7</b><span>PLATFORM ACCESS</span></div><div class="stat"><b>EDM</b><span>SECURE PURCHASE FLOW</span></div></div></div>
- <section><div class="section-head"><div><h2>Hot Matches</h2><p>Today's featured fixtures</p></div></div><div class="matches">${m.map(x=>`<div class="card match"><div class="league">Featured Match</div><div class="teams"><div class="team"><img class="logo" src="${x.homeLogo}" onerror="this.style.opacity=.2">${x.home}</div><div class="vs">VS</div><div class="team"><img class="logo" src="${x.awayLogo}" onerror="this.style.opacity=.2">${x.away}</div></div><div class="time">${x.time}</div></div>`).join("")}</div></section>
- <section><div class="section-head"><div><h2>Premium Bet Slips</h2><p>Unlock picks after payment verification</p></div><button class="ghost" onclick="go('slips')">View all</button></div><div class="slips">${s.slips.map(slipCard).join("")}</div></section></div>`;
+ const featured=s.slips.slice(0,3);
+ app.innerHTML=`<div class="dashboard">
+  <div class="container">
+   <div class="dash-welcome">
+    <div>
+      <div class="eyebrow">EDM MEMBER DASHBOARD</div>
+      <h1>Welcome, <span>${me.name.split(" ")[0]}</span></h1>
+      <p>Explore today's featured matches and EDM premium slips.</p>
+    </div>
+    <button class="green-btn dash-premium-btn" onclick="go('slips')">EXPLORE PREMIUM</button>
+   </div>
+
+   <div class="dash-stats">
+    <div class="dash-stat card"><div class="dash-stat-icon">◈</div><div><span>PREMIUM SLIPS</span><b>${s.slips.length}</b><small>Available today</small></div></div>
+    <div class="dash-stat card"><div class="dash-stat-icon">✓</div><div><span>ACCOUNT</span><b>ACTIVE</b><small>Secure member access</small></div></div>
+    <div class="dash-stat card"><div class="dash-stat-icon">⚡</div><div><span>EDM ACCESS</span><b>24/7</b><small>Browse anytime</small></div></div>
+   </div>
+
+   <section class="dash-section">
+    <div class="section-head"><div><div class="eyebrow">LIVE BOARD</div><h2>Today's Hot Matches</h2><p>Featured fixtures on the EDM home board.</p></div></div>
+    <div class="matches dashboard-matches">${m.map((x,i)=>`<div class="card match match-large">
+      <div class="match-top"><span class="badge">${i<2?"HOT":"FEATURED"}</span><span class="time">${x.time}</span></div>
+      <div class="league">FOOTBALL</div>
+      <div class="teams"><div class="team"><img class="logo" src="${x.homeLogo}" onerror="this.style.opacity=.2">${x.home}</div><div class="vs">VS</div><div class="team"><img class="logo" src="${x.awayLogo}" onerror="this.style.opacity=.2">${x.away}</div></div>
+      <div class="match-bottom"><span>Today's fixture</span><span class="green-dot"></span></div>
+    </div>`).join("")}</div>
+   </section>
+
+   <section class="dash-section">
+    <div class="section-head"><div><div class="eyebrow">EDM PREMIUM</div><h2>Premium Bet Slips</h2><p>Unlock protected selections after payment verification.</p></div><button class="ghost" onclick="go('slips')">VIEW ALL →</button></div>
+    <div class="slips dashboard-slips">${featured.map((x,i)=>`<div class="card slip premium-card">
+      <div class="slip-top"><span class="badge">${i===0?"TODAY'S PICK":"PREMIUM"}</span><span class="lock">🔒 LOCKED</span></div>
+      <h3>${x.title}</h3><div class="muted">${x.league}</div>
+      <div class="slip-meta"><div><span>SELECTIONS</span><b>${x.match_count}</b></div><div><span>TOTAL ODDS</span><b>${x.odds}</b></div><div><span>PRICE</span><b>${money(x.price_tzs)}</b></div></div>
+      <p class="muted">${x.description}</p>
+      <button class="green-btn" onclick="buy(${x.id})">VIEW & UNLOCK</button>
+    </div>`).join("")}</div>
+   </section>
+
+   <section class="dash-section dash-bottom">
+    <div class="card quick-card"><div class="quick-icon">▣</div><div><h3>My Purchases</h3><p>Open your verified premium slips and references.</p></div><button class="ghost" onclick="go('purchases')">OPEN →</button></div>
+    <div class="card quick-card"><div class="quick-icon">◉</div><div><h3>Secure by design</h3><p>Picks and slip codes remain server-side until payment is verified.</p></div></div>
+   </section>
+  </div>
+ </div>`;
 }
 function slipCard(s){return `<div class="card slip"><span class="badge">PREMIUM</span><h3>${s.title}</h3><div class="muted">${s.league} • ${s.match_count} selections</div><div class="price">${money(s.price_tzs)} <small>• total odds ${s.odds}</small></div><p class="muted">${s.description}</p><div class="locked">🔒 Picks & slip code are protected until payment.</div><button class="green-btn" style="margin-top:14px" onclick="buy(${s.id})">VIEW & UNLOCK</button></div>`}
 async function slipsPage(){const {slips}=await api("/api/slips");app.innerHTML=`<div class="container page"><div class="section-head"><div><div class="eyebrow">EDM PREMIUM</div><h2>Premium Bet Slips</h2><p>Choose a package and unlock it through the secure payment flow.</p></div></div><div class="slips">${slips.map(slipCard).join("")}</div></div>`}
