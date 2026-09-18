@@ -33,3 +33,5 @@ For production also use HTTPS, a managed PostgreSQL database or another durable 
 
 
 UI update: EDM top navigation redesigned to match the supplied reference, with inline SVG icons and responsive layout.
+
+UI fix v9: removed the duplicate legacy header brand so the new EDM navigation appears only once and aligns from the left like the supplied reference.

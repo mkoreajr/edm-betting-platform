@@ -14,7 +14,7 @@
   z-index:20;
   box-shadow:0 1px 18px #00ff6612;
 }
-.edm-nav-left{display:flex;align-items:center;gap:78px;min-width:0}
+.edm-nav-left{display:flex;align-items:center;gap:68px;min-width:0;flex:1}
 .nav-brand{
   display:flex;align-items:center;gap:10px;
   border:0;background:transparent;padding:0;cursor:pointer;
@@ -28,7 +28,7 @@
 .nav-platform{
   font-size:11px;font-weight:700;letter-spacing:1px;color:#e6eee9;
 }
-.edm-nav-links{display:flex;align-items:center;gap:16px}
+.edm-nav-links{display:flex;align-items:center;gap:10px}
 .nav-btn{
   height:40px;
   display:flex;align-items:center;justify-content:center;gap:9px;
@@ -45,7 +45,7 @@
 .nav-icon{width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center}
 .nav-icon svg{width:17px;height:17px;fill:none;stroke:#b9c9bf;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
 .nav-home .nav-icon svg{stroke:var(--green)}
-.edm-nav-right{display:flex;align-items:center;gap:28px;margin-left:20px}
+.edm-nav-right{display:flex;align-items:center;gap:26px;margin-left:auto;flex-shrink:0}
 .nav-tagline{
   color:var(--green);font-size:12px;font-weight:900;letter-spacing:2px;
   white-space:nowrap;text-shadow:0 0 14px #43ff7740;
@@ -181,3 +181,13 @@
 .support-card{padding:22px}
 .support-card b{font-size:17px}
 @media(max-width:700px){.support-grid{grid-template-columns:1fr}}
+
+.edm-nav{width:100%;display:flex;align-items:center;justify-content:space-between;margin:0;padding:0}
+.nav-brand{min-width:286px}
+@media(max-width:1180px){
+  .edm-nav-left{gap:28px}
+  .nav-brand{min-width:245px}
+}
+@media(max-width:800px){
+  .nav-brand{min-width:auto}
+}
