@@ -57,3 +57,7 @@ Admin v18: admins can edit slip details and add/remove match picks with market, 
 Admin fixed v20: corrected the v18 editor API to use the existing bet_slips/slip_picks schema and existing auth/admin middleware. Added startup admin bootstrap from Railway ADMIN_EMAIL/ADMIN_PASSWORD variables.
 
 Admin v21: added Users, Payments and Purchases admin activity endpoints and tabbed admin UI.
+
+Admin v22: fixed blank-page issue caused by an accidental standalone `async` token in public/app.js. Verified app.js and server.js with node --check.
+
+Admin v23: fixed second frontend syntax issue: adminPage now correctly declared async. app.js and server.js pass node --check.

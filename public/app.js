@@ -457,7 +457,6 @@ function purchaseCard(p){
   </article>`;
 }
 
-async 
 function adminSection(section){
   document.querySelectorAll(".admin-tab").forEach(b=>b.classList.toggle("active",b.dataset.section===section));
   const body=document.querySelector("#admin-section-body");
@@ -494,7 +493,7 @@ async function adminPurchases(body){
   }catch(e){body.innerHTML=`<div class="error">${escapeHtml(e.message)}</div>`}
 }
 
-function adminPage(){
+async function adminPage(){
   const d=await api("/api/admin/overview");
   const slips=d.slips||[], users=d.users||[], payments=d.payments||[], purchases=d.purchases||[];
   app.innerHTML=`<div class="admin-page-v17"><div class="container">
