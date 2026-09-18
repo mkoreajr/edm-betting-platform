@@ -4,6 +4,8 @@ const icons={
   document:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12h6M9 15.5h6"/></svg>`,
   user:`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.7-3.4 3-5.1 6.5-5.1s5.8 1.7 6.5 5.1"/></svg>`,
   headset:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><path d="M4 13h3v6H5a1 1 0 0 1-1-1zM20 13h-3v6h2a1 1 0 0 0 1-1z"/><path d="M17 19c-1 .9-2.2 1.5-4 1.5"/></svg>`,
+  check:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>`,
+  copy:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"/></svg>`,
   lock:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v3"/></svg>`,
   shield:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 19 6v5.2c0 4.7-2.8 7.9-7 9.8-4.2-1.9-7-5.1-7-9.8V6l7-2.5Z"/><path d="m9 12 2 2 4-4"/></svg>`,
   profile:`<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21"/><circle cx="24" cy="18" r="5.2"/><path d="M13.5 36c1.2-5.3 4.8-8 10.5-8s9.3 2.7 10.5 8"/></svg>`
@@ -260,7 +262,51 @@ async function slipsPage(){
     </div>
   </div>`
 }
-async function detailPage(id){try{const d=await api(`/api/slips/${id}`);app.innerHTML=`<div class="container page"><div class="detail"><span class="badge">PREMIUM SLIP</span><h1>${d.slip.title}</h1><p class="muted">${d.slip.league} • ${d.slip.match_count} selections • total odds ${d.slip.odds}</p><div class="card" style="padding:22px;margin-top:20px"><p>${d.slip.description}</p><div class="locked">🔒 Individual picks and the final slip code are withheld from this response until payment is verified.</div><div class="price">${money(d.slip.price_tzs)}</div><button class="green-btn" onclick="buy(${id})">PAY & UNLOCK</button></div></div></div>`}catch(e){app.innerHTML=`<div class="container page"><div class="empty">${e.message}</div></div>`}}
+async function detailPage(id){
+  const d=await api(`/api/slips/${id}`);
+  const s=d.slip, purchased=!!d.purchased;
+  app.innerHTML=`<div class="slip-detail-page"><div class="container">
+    <div class="detail-back"><button class="text-btn" onclick="go('slips')">← Back to Premium Picks</button></div>
+    <section class="slip-detail-hero">
+      <div><div class="eyebrow">EDM PREMIUM SLIP</div><h1>${s.title}</h1><p>${s.league} • ${s.match_count} selections • Total odds ${s.odds}</p></div>
+      <div class="detail-price"><span>ACCESS</span><b>${money(s.price_tzs)} TZS</b><small>${purchased?"UNLOCKED":"ONE-TIME ACCESS"}</small></div>
+    </section>
+    ${purchased ? unlockedSlip(s) : lockedSlip(s)}
+  </div></div>`;
+}
+function lockedSlip(s){
+ return `<section class="locked-detail-grid">
+  <div class="card locked-detail-main">
+   <div class="detail-section-head"><div><span class="detail-label">MATCH SELECTIONS</span><h2>Premium picks are locked</h2></div><span class="detail-lock">${icons.lock}</span></div>
+   <div class="hidden-picks">${Array.from({length:Math.min(Number(s.match_count)||6,8)},(_,i)=>`<div class="hidden-pick"><span class="hidden-number">${String(i+1).padStart(2,"0")}</span><div><b>••••••••••••</b><small>Selection protected</small></div><strong>••••</strong></div>`).join("")}</div>
+   <div class="unlock-banner"><div class="unlock-icon">${icons.shield}</div><div><b>Unlock the full slip</b><p>Pay once to reveal all teams, selections, odds and your unique bet slip code.</p></div></div>
+  </div>
+  <aside class="card purchase-panel">
+   <div class="purchase-panel-top"><span class="detail-label">PREMIUM ACCESS</span><span class="available-dot">● AVAILABLE</span></div>
+   <div class="purchase-total"><small>PRICE</small><b>${money(s.price_tzs)} <em>TZS</em></b></div>
+   <div class="purchase-points">
+    <div>${icons.check}<span>${s.match_count} football selections</span></div><div>${icons.check}<span>Total odds ${s.odds}</span></div>
+    <div>${icons.check}<span>Bet slip code included</span></div><div>${icons.check}<span>Instant access after verification</span></div>
+   </div>
+   <button class="green-btn unlock-main-btn" onclick="buy(${s.id})">UNLOCK THIS SLIP</button>
+   <div class="secure-mini">${icons.lock}<span>Secure payment • Protected picks</span></div>
+  </aside>
+ </section>`;
+}
+function unlockedSlip(s){
+ const picks=s.picks||[];
+ return `<section class="unlocked-detail">
+  <div class="unlocked-success"><div class="success-icon">${icons.check}</div><div><span>PAYMENT VERIFIED</span><h2>Premium slip unlocked</h2><p>Your selections and bet slip code are now available.</p></div></div>
+  <div class="unlocked-grid">
+   <div class="card picks-panel"><div class="detail-section-head"><div><span class="detail-label">MATCH SELECTIONS</span><h2>${picks.length} Picks</h2></div><span class="odds-chip">ODDS ${s.odds}</span></div>
+    <div class="real-picks">${picks.map((p,i)=>`<div class="real-pick"><span class="pick-number">${String(i+1).padStart(2,"0")}</span><div class="pick-match"><b>${p.match}</b><small>${p.market}</small></div><span class="pick-selection">${p.selection}</span><strong class="pick-odd">${p.odd}</strong></div>`).join("")}</div>
+   </div>
+   <aside class="card code-panel"><span class="detail-label">BET SLIP CODE</span><div class="slip-code">${s.code||"EDM-PREMIUM"}</div><p>Use this code when placing your selections.</p><button class="ghost code-copy" onclick="copySlipCode('${String(s.code||"EDM-PREMIUM").replace(/'/g,"\\'")}')">${icons.copy} COPY CODE</button><div class="code-secure">${icons.shield}<span>Verified purchase<br>Full access granted</span></div></aside>
+  </div>
+ </section>`;
+}
+async function copySlipCode(code){try{await navigator.clipboard.writeText(code)}catch(e){} const b=document.querySelector(".code-copy");if(b){b.textContent="✓ COPIED";setTimeout(()=>{b.innerHTML=`${icons.copy} COPY CODE`},1400)}}
+
 async function buy(id){
   try{
     const d=await api(`/api/slips/${id}`);

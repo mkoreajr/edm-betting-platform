@@ -43,3 +43,5 @@ UI v11: mobile top-bar navigation is collapsed into a hamburger menu; opening th
 UI v12: Premium Picks page redesigned with premium cards, protected-selection preview, pricing/stats, secure-access notice, and mobile responsive layout.
 
 UI v13: Premium slip checkout modal redesigned with mobile-money provider cards, secure summary, verification state, and responsive layout. Payment remains DEMO until live provider credentials/webhook are connected.
+
+UI v14: Slip Details / Unlock page with locked picks, secure purchase panel, verified unlocked picks, odds and copyable bet slip code.
