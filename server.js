@@ -294,19 +294,19 @@ app.get("/api/admin/users", auth, admin, (req,res)=>{
 
 app.get("/api/admin/payments", auth, admin, (req,res)=>{
   const rows=db.prepare(`
-    SELECT pay.id,pay.provider,pay.phone,pay.amount_tzs,pay.status,pay.reference,pay.created_at,
+    SELECT p.id,p.provider,p.amount_tzs,p.status,p.reference,p.created_at,
       u.email AS user_email, s.title AS slip_title
-    FROM payments pay
-    LEFT JOIN users u ON u.id=pay.user_id
-    LEFT JOIN bet_slips s ON s.id=pay.slip_id
-    ORDER BY pay.id DESC LIMIT 100
+    FROM purchases p
+    LEFT JOIN users u ON u.id=p.user_id
+    LEFT JOIN bet_slips s ON s.id=p.slip_id
+    ORDER BY p.id DESC LIMIT 100
   `).all();
   res.json(rows);
 });
 
 app.get("/api/admin/purchases", auth, admin, (req,res)=>{
   const rows=db.prepare(`
-    SELECT p.id,p.amount_tzs,p.created_at,p.verified,
+    SELECT p.id,p.amount_tzs,p.provider,p.reference,p.status,p.paid_at,p.created_at,
       u.email AS user_email,s.title AS slip_title,s.league
     FROM purchases p
     LEFT JOIN users u ON u.id=p.user_id
