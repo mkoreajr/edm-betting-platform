@@ -214,5 +214,5 @@ app.patch("/api/admin/slips/:id/status",auth,admin,(req,res)=>{
   res.json({ok:true});
 });
 
-app.get("*",(req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
+app.use((req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
 app.listen(PORT,()=>console.log(`EDM running on http://localhost:${PORT}`));
