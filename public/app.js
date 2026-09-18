@@ -505,10 +505,10 @@ async function adminEditSlip(id){
       <div class="admin-form-row"><input class="input" id="eTitle" value="${escAttr(s.title)}" placeholder="Slip title"><input class="input" id="eLeague" value="${escAttr(s.league)}" placeholder="League"></div>
       <input class="input" id="eDesc" value="${escAttr(s.description||"")}" placeholder="Description">
       <div class="admin-form-row"><input class="input" id="eOdds" type="number" step="0.01" value="${s.odds}" placeholder="Total odds"><input class="input" id="ePrice" type="number" value="${s.price_tzs}" placeholder="Price TZS"></div>
-      <label class="editor-check"><input type="checkbox" id="eActive" ${s.active?"checked":""}> <span>Slip active / visible to members</span></label>
+      <label class="editor-check"><input type="checkbox" id="eActive" ${s.status==="active"?"checked":""}> <span>Slip active / visible to members</span></label>
       <button class="green-btn" onclick="adminSaveSlip(${id})">SAVE SLIP DETAILS</button>
       <div class="editor-picks-head"><span class="detail-label">MATCH PICKS (${picks.length})</span><button class="table-btn" onclick="adminAddPick(${id})">+ ADD PICK</button></div>
-      <div class="editor-picks-list">${picks.map((p,i)=>`<div class="editor-pick-row"><span class="editor-pick-no">${String(i+1).padStart(2,"0")}</span><div><b>${escapeHtml(p.match)}</b><small>${escapeHtml(p.market)} • ${escapeHtml(p.selection)}</small></div><strong>${p.odd}</strong><button class="delete-pick" onclick="adminDeletePick(${id},${p.id} )">×</button></div>`).join("")||`<div class="admin-empty-v17">No picks yet.</div>`}</div>
+      <div class="editor-picks-list">${picks.map((p,i)=>`<div class="editor-pick-row"><span class="editor-pick-no">${String(i+1).padStart(2,"0")}</span><div><b>${escapeHtml(p.match)}</b><small>${escapeHtml(p.pick)}</small></div><strong>${p.odds}</strong><button class="delete-pick" onclick="adminDeletePick(${id},${p.id})">×</button></div>`).join("")||`<div class="admin-empty-v17">No picks yet.</div>`}</div>
     </div>`);
   }catch(e){openModal(`<div class="error">${e.message}</div>`)}
 }
@@ -528,15 +528,15 @@ function adminAddPick(id){
   modalBody.insertAdjacentHTML("beforeend",`<div class="add-pick-box">
     <div class="detail-label">NEW MATCH PICK</div>
     <input class="input" id="pMatch" placeholder="e.g. Bayern Munich vs Dortmund">
-    <div class="admin-form-row"><input class="input" id="pMarket" placeholder="Market e.g. Over 2.5"><input class="input" id="pSelection" placeholder="Selection e.g. Over 2.5"></div>
-    <input class="input" id="pOdd" type="number" step="0.01" placeholder="Odd">
+    <input class="input" id="pPick" placeholder="Pick e.g. Over 2.5">
+    <input class="input" id="pOdds" type="number" step="0.01" placeholder="Odds">
     <button class="green-btn" onclick="adminSavePick(${id})">ADD PICK</button>
   </div>`);
 }
 async function adminSavePick(id){
   try{
     await api(`/api/admin/slips/${id}/picks`,{method:"POST",body:JSON.stringify({
-      match:document.querySelector("#pMatch").value.trim(),market:document.querySelector("#pMarket").value.trim(),selection:document.querySelector("#pSelection").value.trim(),odd:Number(document.querySelector("#pOdd").value)
+      match:document.querySelector("#pMatch").value.trim(),pick:document.querySelector("#pPick").value.trim(),odds:Number(document.querySelector("#pOdds").value)
     })});
     await adminEditSlip(id);
   }catch(e){modalBody.innerHTML+=`<div class="error">${e.message}</div>`}

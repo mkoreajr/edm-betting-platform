@@ -53,3 +53,5 @@ UI v16: Member Account page redesigned with profile information, verified status
 UI v17: Admin Control Center redesigned with stats, premium slip management, activate/hide controls, payment activity, recent members, and add-slip modal.
 
 Admin v18: admins can edit slip details and add/remove match picks with market, selection and odds. Pick count syncs automatically.
+
+Admin fixed v20: corrected the v18 editor API to use the existing bet_slips/slip_picks schema and existing auth/admin middleware. Added startup admin bootstrap from Railway ADMIN_EMAIL/ADMIN_PASSWORD variables.
