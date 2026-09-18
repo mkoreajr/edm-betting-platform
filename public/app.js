@@ -21,7 +21,8 @@ function navRender(){
         <span class="nav-brand-divider"></span>
         <span class="nav-platform">BETTING PLATFORM</span>
       </button>
-      <div class="edm-nav-links">
+
+      <div class="edm-nav-links desktop-nav-links">
         <button class="nav-btn nav-home" onclick="go('home')">
           <span class="nav-icon">${icons.home}</span><span>Home</span>
         </button>
@@ -38,13 +39,56 @@ function navRender(){
           <span class="nav-icon">${icons.headset}</span><span>Support</span>
         </button>
       </div>
+
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
+
     <div class="edm-nav-right">
       <div class="nav-tagline">PREDICT • PLAY • WIN</div>
       <button class="profile-btn" onclick="go('${me.role==="admin"?"admin":"account"}')" aria-label="Account">
         ${icons.profile}
       </button>
+    </div>
+
+    <div class="mobile-nav-menu" id="mobileNavMenu">
+      <button class="mobile-nav-item" onclick="mobileGo('home')">
+        <span class="nav-icon">${icons.home}</span><span>Home</span>
+      </button>
+      <button class="mobile-nav-item" onclick="mobileGo('slips')">
+        <span class="nav-icon">${icons.ticket}</span><span>Premium Picks</span>
+      </button>
+      <button class="mobile-nav-item" onclick="mobileGo('purchases')">
+        <span class="nav-icon">${icons.document}</span><span>My Purchases</span>
+      </button>
+      <button class="mobile-nav-item" onclick="mobileGo('account')">
+        <span class="nav-icon">${icons.user}</span><span>Account</span>
+      </button>
+      <button class="mobile-nav-item" onclick="mobileGo('support')">
+        <span class="nav-icon">${icons.headset}</span><span>Support</span>
+      </button>
     </div>` : "";
+}
+
+function toggleMobileMenu(){
+  const menu=document.getElementById("mobileNavMenu");
+  const btn=document.getElementById("mobileMenuToggle");
+  if(!menu || !btn) return;
+  const open=menu.classList.toggle("open");
+  btn.classList.toggle("open",open);
+  btn.setAttribute("aria-expanded",String(open));
+}
+
+function mobileGo(page){
+  const menu=document.getElementById("mobileNavMenu");
+  const btn=document.getElementById("mobileMenuToggle");
+  if(menu) menu.classList.remove("open");
+  if(btn){
+    btn.classList.remove("open");
+    btn.setAttribute("aria-expanded","false");
+  }
+  go(page);
 }
 async function boot(){try{me=(await api("/api/me")).user}catch{}navRender();go(me?"home":"login")}
 function go(page,id){location.hash=page+(id?`/${id}`:"");render(page,id)}
