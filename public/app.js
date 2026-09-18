@@ -458,13 +458,15 @@ function purchaseCard(p){
 }
 
 function adminSection(section){
-  document.querySelectorAll(".admin-tab").forEach(b=>b.classList.toggle("active",b.dataset.section===section));
+  document.querySelectorAll(".admin-tab-v25").forEach(b=>b.classList.toggle("active",b.dataset.section===section));
   const body=document.querySelector("#admin-section-body");
   if(!body)return;
+  if(section==="slips"){adminPage();return;}
   if(section==="users") return adminUsers(body);
   if(section==="payments") return adminPayments(body);
   if(section==="purchases") return adminPurchases(body);
 }
+
 async function adminUsers(body){
   body.innerHTML='<div class="admin-loading">Loading members…</div>';
   try{
@@ -494,43 +496,64 @@ async function adminPurchases(body){
 }
 
 async function adminPage(){
-  const d=await api("/api/admin/overview");
-  const slips=d.slips||[], users=d.users||[], payments=d.payments||[], purchases=d.purchases||[];
-  app.innerHTML=`<div class="admin-page-v17"><div class="container">
-    <section class="admin-hero-v17">
-      <div><div class="eyebrow">EDM CONTROL CENTER</div><h1>Admin <span>Dashboard</span></h1><p>Manage premium slips, members, payments and purchases.</p></div>
-      <span class="admin-live-v17">● SYSTEM ONLINE</span>
-    </section>
-
-    <section class="admin-stats-v17">
-      <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.ticket}</span><small>PREMIUM SLIPS</small><b>${slips.length}</b><em>Available</em></div>
-      <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.user}</span><small>MEMBERS</small><b>${users.length}</b><em>Registered users</em></div>
-      <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.payment}</span><small>PAYMENTS</small><b>${payments.length}</b><em>Recorded</em></div>
-      <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.check}</span><small>PURCHASES</small><b>${purchases.length}</b><em>Verified access</em></div>
-    </section>
-
-    <section class="admin-section-v17">
-      <div class="admin-section-head-v17"><div><span class="detail-label">PREMIUM CATALOG</span><h2>Manage Bet Slips</h2></div><button class="green-btn admin-add-btn-v17" onclick="adminNewSlip()">+ ADD PREMIUM SLIP</button></div>
-      <div class="admin-table-wrap-v17 card"><table class="admin-table-v17"><thead><tr><th>SLIP</th><th>LEAGUE</th><th>PICKS</th><th>ODDS</th><th>PRICE</th><th>STATUS</th><th>ACTION</th></tr></thead>
-      <tbody>${slips.map(s=>`<tr><td><b>${s.title}</b></td><td>${s.league}</td><td>${s.match_count}</td><td>${s.odds}</td><td>${money(s.price_tzs)} TZS</td><td><span class="admin-status ${s.active?"on":"off"}">${s.active?"ACTIVE":"HIDDEN"}</span></td><td><div class="admin-table-actions"><button class="table-btn" onclick="adminEditSlip(${s.id})">EDIT</button><button class="table-btn" onclick="adminToggleSlip(${s.id},${s.active?0:1})">${s.active?"HIDE":"ACTIVATE"}</button></div></td></tr>`).join("")||`<tr><td colspan="7" class="admin-empty-cell">No premium slips found.</td></tr>`}</tbody></table></div>
-    </section>
-
-    <section class="admin-two-col-v17">
-      <div class="admin-section-v17">
-        <div class="admin-section-head-v17"><div><span class="detail-label">RECENT PURCHASES</span><h2>Payment Activity</h2></div></div>
-        <div class="card admin-list-v17">${purchases.slice(0,8).map(p=>`<div class="admin-row-v17"><div class="admin-row-icon">${icons.payment}</div><div><b>${p.title||"Premium Slip"}</b><small>${p.provider||"Mobile Money"} • ${p.created_at?new Date(p.created_at).toLocaleDateString("en-GB"):"—"}</small></div><strong>${money(p.amount_tzs||p.price_tzs||0)} TZS</strong></div>`).join("")||`<div class="admin-empty-v17">No purchases yet.</div>`}</div>
+  try{
+    const [overview,slipData,userRows,paymentRows,purchaseRows]=await Promise.all([
+      api("/api/admin/overview"),
+      api("/api/admin/slips"),
+      api("/api/admin/users"),
+      api("/api/admin/payments"),
+      api("/api/admin/purchases")
+    ]);
+    const slips=slipData.slips||[], users=userRows||[], payments=paymentRows||[], purchases=purchaseRows||[];
+    app.innerHTML=`<div class="admin-page-v17"><div class="container">
+      <section class="admin-hero-v17">
+        <div><div class="eyebrow">EDM CONTROL CENTER</div><h1>Admin <span>Dashboard</span></h1><p>Manage premium slips, members, payments and purchases.</p></div>
+        <span class="admin-live-v17">● SYSTEM ONLINE</span>
+      </section>
+      <section class="admin-stats-v17">
+        <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.ticket}</span><small>PREMIUM SLIPS</small><b>${slips.length}</b><em>Catalog</em></div>
+        <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.user}</span><small>MEMBERS</small><b>${users.length}</b><em>Registered users</em></div>
+        <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.payment}</span><small>PAYMENTS</small><b>${payments.length}</b><em>Latest activity</em></div>
+        <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.check}</span><small>PURCHASES</small><b>${purchases.length}</b><em>Recorded purchases</em></div>
+      </section>
+      <div class="admin-tabs-v25">
+        <button class="admin-tab-v25 active" data-section="slips" onclick="adminSection('slips')">Premium Slips</button>
+        <button class="admin-tab-v25" data-section="users" onclick="adminSection('users')">Users</button>
+        <button class="admin-tab-v25" data-section="payments" onclick="adminSection('payments')">Payments</button>
+        <button class="admin-tab-v25" data-section="purchases" onclick="adminSection('purchases')">Purchases</button>
       </div>
-      <div class="admin-section-v17">
-        <div class="admin-section-head-v17"><div><span class="detail-label">MEMBERS</span><h2>Recent Users</h2></div></div>
-        <div class="card admin-list-v17">${users.slice(0,8).map(u=>`<div class="admin-row-v17"><div class="admin-user-avatar">${(u.name||u.email||"U").slice(0,1).toUpperCase()}</div><div><b>${u.name||"EDM Member"}</b><small>${u.email||"—"}</small></div><span class="admin-role-v17">${u.role||"member"}</span></div>`).join("")||`<div class="admin-empty-v17">No users yet.</div>`}</div>
-      </div>
-    </section>
-
-    <div class="admin-security-v17 card">${icons.shield}<div><b>Admin access protected</b><p>Only accounts with the admin role can access this control center. Keep admin credentials private.</p></div></div>
-  </div></div>`;
+      <section id="admin-section-body" class="admin-section-body-v25">
+        <section class="admin-section-v17">
+          <div class="admin-section-head-v17"><div><span class="detail-label">PREMIUM CATALOG</span><h2>Manage Bet Slips</h2></div><button class="green-btn admin-add-btn-v17" onclick="adminNewSlip()">+ ADD PREMIUM SLIP</button></div>
+          <div class="admin-table-wrap-v17 card"><table class="admin-table-v17"><thead><tr><th>SLIP</th><th>LEAGUE</th><th>PICKS</th><th>ODDS</th><th>PRICE</th><th>STATUS</th><th>ACTION</th></tr></thead>
+          <tbody>${slips.map(s=>`<tr><td><b>${escapeHtml(s.title)}</b></td><td>${escapeHtml(s.league)}</td><td>${s.match_count}</td><td>${s.odds}</td><td>${money(s.price_tzs)} TZS</td><td><span class="admin-status ${s.status==="active"?"on":"off"}">${s.status==="active"?"ACTIVE":"HIDDEN"}</span></td><td><div class="admin-table-actions"><button class="table-btn" onclick="adminEditSlip(${s.id})">EDIT</button><button class="table-btn" onclick="adminToggleSlip(${s.id},'${s.status==="active"?"hidden":"active"}')">${s.status==="active"?"HIDE":"ACTIVATE"}</button></div></td></tr>`).join("")||`<tr><td colspan="7" class="admin-empty-cell">No premium slips found.</td></tr>`}</tbody></table></div>
+        </section>
+        <section class="admin-two-col-v17">
+          <div class="admin-section-v17"><div class="admin-section-head-v17"><div><span class="detail-label">RECENT PURCHASES</span><h2>Payment Activity</h2></div></div>
+            <div class="card admin-list-v17">${purchases.slice(0,8).map(p=>`<div class="admin-row-v17"><div class="admin-row-icon">${icons.payment}</div><div><b>${escapeHtml(p.slip_title||"Premium Slip")}</b><small>${escapeHtml(p.user_email||"—")} • ${escapeHtml(p.provider||"Mobile Money")}</small></div><strong>${money(p.amount_tzs||0)} TZS</strong></div>`).join("")||`<div class="admin-empty-v17">No purchases yet.</div>`}</div>
+          </div>
+          <div class="admin-section-v17"><div class="admin-section-head-v17"><div><span class="detail-label">MEMBERS</span><h2>Recent Users</h2></div></div>
+            <div class="card admin-list-v17">${users.slice(0,8).map(u=>`<div class="admin-row-v17"><div class="admin-user-avatar">${(u.name||u.email||"U").slice(0,1).toUpperCase()}</div><div><b>${escapeHtml(u.name||"EDM Member")}</b><small>${escapeHtml(u.email||"—")}</small></div><span class="admin-role-v17">${escapeHtml(u.role||"member")}</span></div>`).join("")||`<div class="admin-empty-v17">No users yet.</div>`}</div>
+          </div>
+        </section>
+      </section>
+      <div class="admin-security-v17 card">${icons.shield}<div><b>Admin access protected</b><p>Only accounts with the admin role can access this control center. Keep admin credentials private.</p></div></div>
+    </div></div>`;
+  }catch(e){
+    app.innerHTML=`<div class="container"><div class="error admin-fatal-v25">Admin dashboard could not load: ${escapeHtml(e.message)}<br><button class="green-btn" onclick="adminPage()">RETRY</button></div></div>`;
+  }
 }
-async function adminToggleSlip(id,active){
-  try{await api(`/api/admin/slips/${id}/status`,{method:"POST",body:JSON.stringify({active:!!active})});await adminPage()}catch(e){openModal(`<div class="error">${e.message}</div>`)}
+function adminRenderSection(section,body){
+  if(section==="slips"){
+    adminPage(); return;
+  }
+  adminSection(section);
+}
+async function adminToggleSlip(id,status){
+  try{
+    await api(`/api/admin/slips/${id}/status`,{method:"PATCH",body:JSON.stringify({status})});
+    await adminPage();
+  }catch(e){openModal(`<div class="error">${escapeHtml(e.message)}</div>`)}
 }
 async function adminEditSlip(id){
   try{
