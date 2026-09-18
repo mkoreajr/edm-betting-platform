@@ -261,8 +261,59 @@ async function slipsPage(){
   </div>`
 }
 async function detailPage(id){try{const d=await api(`/api/slips/${id}`);app.innerHTML=`<div class="container page"><div class="detail"><span class="badge">PREMIUM SLIP</span><h1>${d.slip.title}</h1><p class="muted">${d.slip.league} • ${d.slip.match_count} selections • total odds ${d.slip.odds}</p><div class="card" style="padding:22px;margin-top:20px"><p>${d.slip.description}</p><div class="locked">🔒 Individual picks and the final slip code are withheld from this response until payment is verified.</div><div class="price">${money(d.slip.price_tzs)}</div><button class="green-btn" onclick="buy(${id})">PAY & UNLOCK</button></div></div></div>`}catch(e){app.innerHTML=`<div class="container page"><div class="empty">${e.message}</div></div>`}}
-function buy(id){openModal(`<div class="eyebrow">SECURE PURCHASE</div><h2>Unlock Premium Slip</h2><p class="muted">Select a payment method. This build uses DEMO confirmation until a real payment provider is connected.</p><select class="input" id="provider"><option>M-Pesa</option><option>Airtel Money</option><option>Tigo Pesa</option></select><button class="green-btn" onclick="confirmDemo(${id})">CONFIRM DEMO PAYMENT</button>`)}
-async function confirmDemo(id){try{await api("/api/payments/demo-confirm",{method:"POST",body:JSON.stringify({slipId:id,provider:document.querySelector("#provider").value})});closeModal();await unlock(id)}catch(e){modalBody.innerHTML+=`<div class="error">${e.message}</div>`}}
+async function buy(id){
+  try{
+    const d=await api(`/api/slips/${id}`);
+    const s=d.slip;
+    openModal(`
+      <div class="payment-modal">
+        <div class="payment-head">
+          <div><div class="eyebrow">EDM SECURE CHECKOUT</div><h2>Unlock Premium Slip</h2></div>
+          <span class="payment-secure">${icons.shield} SECURE</span>
+        </div>
+        <div class="payment-slip-summary">
+          <div><span>PREMIUM SLIP</span><b>${s.title}</b><small>${s.league} • ${s.match_count} selections</small></div>
+          <div class="payment-amount">${money(s.price_tzs)}<small>TZS</small></div>
+        </div>
+        <div class="payment-section-title">SELECT PAYMENT METHOD</div>
+        <div class="provider-grid">
+          <button type="button" class="provider-card active" data-provider="M-Pesa" onclick="selectProvider(this)">
+            <span class="provider-logo mpesa">M</span><span><b>M-Pesa</b><small>Vodacom</small></span><i>✓</i>
+          </button>
+          <button type="button" class="provider-card" data-provider="Airtel Money" onclick="selectProvider(this)">
+            <span class="provider-logo airtel">A</span><span><b>Airtel Money</b><small>Airtel</small></span><i>✓</i>
+          </button>
+          <button type="button" class="provider-card" data-provider="Tigo Pesa" onclick="selectProvider(this)">
+            <span class="provider-logo tigo">T</span><span><b>Tigo Pesa</b><small>Tigo</small></span><i>✓</i>
+          </button>
+        </div>
+        <input type="hidden" id="provider" value="M-Pesa">
+        <div class="payment-note">${icons.lock}<span>Your selections and slip code remain hidden until payment is verified.</span></div>
+        <button class="green-btn payment-confirm" onclick="confirmDemo(${id})">CONTINUE TO PAYMENT</button>
+        <div class="payment-demo">DEMO MODE • Live mobile-money credentials/webhook are required for real payments.</div>
+      </div>`);
+  }catch(e){openModal(`<div class="error">${e.message}</div>`)}
+}
+function selectProvider(el){
+  document.querySelectorAll(".provider-card").forEach(x=>x.classList.remove("active"));
+  el.classList.add("active");
+  const input=document.querySelector("#provider");
+  if(input) input.value=el.dataset.provider;
+}
+async function confirmDemo(id){
+  try{
+    const provider=document.querySelector("#provider").value;
+    const btn=document.querySelector(".payment-confirm");
+    if(btn){btn.disabled=true;btn.textContent="VERIFYING..."}
+    await api("/api/payments/demo-confirm",{method:"POST",body:JSON.stringify({slipId:id,provider})});
+    closeModal();
+    await unlock(id);
+  }catch(e){
+    const btn=document.querySelector(".payment-confirm");
+    if(btn){btn.disabled=false;btn.textContent="CONTINUE TO PAYMENT"}
+    modalBody.innerHTML+=`<div class="error">${e.message}</div>`;
+  }
+}
 async function unlock(id){try{const d=await api(`/api/slips/${id}/unlock`);app.innerHTML=`<div class="container page"><div class="detail"><span class="badge">UNLOCKED</span><h1>${d.slip.title}</h1><div class="notice">Payment verified • Reference: ${d.purchase.reference}</div><div class="card" style="padding:22px"><p><b>Slip Code:</b> <span style="color:var(--green)">${d.slipCode}</span></p>${d.picks.map(p=>`<div class="pick"><span>${p.match}</span><b>${p.pick} · ${p.odds}</b></div>`).join("")}</div></div></div>`}catch(e){go("detail",id)}}
 function accountPage(){
   app.innerHTML=`<div class="container page account-page">

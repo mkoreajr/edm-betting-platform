@@ -41,3 +41,5 @@ UI fix v10: updated Bayern Munich hot-match logo to the current 2024 Wikimedia C
 UI v11: mobile top-bar navigation is collapsed into a hamburger menu; opening the menu reveals Home, Premium Picks, My Purchases, Account and Support, and selecting an item closes the menu automatically.
 
 UI v12: Premium Picks page redesigned with premium cards, protected-selection preview, pricing/stats, secure-access notice, and mobile responsive layout.
+
+UI v13: Premium slip checkout modal redesigned with mobile-money provider cards, secure summary, verification state, and responsive layout. Payment remains DEMO until live provider credentials/webhook are connected.

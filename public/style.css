@@ -388,3 +388,40 @@
   .premium-filter{display:none}
   .premium-card-title h3{font-size:18px}
 }
+
+/* Payment checkout v13 */
+.payment-modal{width:100%}
+.payment-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:20px}
+.payment-head h2{margin:6px 0 0;font-size:25px}
+.payment-secure{display:flex;align-items:center;gap:5px;color:#18ed68;font-size:9px;font-weight:900;letter-spacing:1px;border:1px solid #15532e;border-radius:99px;padding:7px 9px;background:#06160c}
+.payment-secure svg{width:13px;height:13px;fill:none;stroke:#18ed68;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.payment-slip-summary{display:flex;justify-content:space-between;gap:20px;padding:15px;border:1px solid #153c25;border-radius:12px;background:linear-gradient(135deg,#07150d,#041009);margin-bottom:19px}
+.payment-slip-summary span{display:block;color:#18ed68;font-size:8px;letter-spacing:1.4px;font-weight:900;margin-bottom:5px}
+.payment-slip-summary b{display:block;font-size:16px;color:#f1f7f3}
+.payment-slip-summary small{display:block;color:#718b7c;font-size:10px;margin-top:4px}
+.payment-amount{color:#18ed68;font-size:18px;font-weight:950;text-align:right;white-space:nowrap}
+.payment-amount small{color:#6b8577;font-size:8px;letter-spacing:1px}
+.payment-section-title{font-size:9px;font-weight:900;color:#779184;letter-spacing:1.4px;margin-bottom:9px}
+.provider-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.provider-card{position:relative;min-height:67px;display:flex;align-items:center;gap:9px;text-align:left;padding:10px;background:#061009;border:1px solid #163d27;border-radius:11px;color:#e4eee8;cursor:pointer}
+.provider-card:hover{border-color:#1a7940}
+.provider-card.active{border-color:#18ed68;background:#082015;box-shadow:inset 0 0 20px #18ed6810}
+.provider-card i{position:absolute;right:7px;top:6px;width:14px;height:14px;display:grid;place-items:center;border-radius:50%;background:#18ed68;color:#031008;font-size:9px;font-style:normal;opacity:0}
+.provider-card.active i{opacity:1}
+.provider-card b{display:block;font-size:10px}
+.provider-card small{display:block;color:#6e8879;font-size:8px;margin-top:2px}
+.provider-logo{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;font-weight:950;font-size:15px}
+.provider-logo.mpesa{background:#16833b;color:#fff}
+.provider-logo.airtel{background:#d71920;color:#fff}
+.provider-logo.tigo{background:#00a9e0;color:#fff}
+.payment-note{display:flex;align-items:center;gap:8px;margin:15px 0;padding:10px 12px;background:#041008;border:1px dashed #204b30;border-radius:9px;color:#71897d;font-size:9px;line-height:1.4}
+.payment-note svg{width:15px;height:15px;flex:none;fill:none;stroke:#18ed68;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.payment-confirm{min-height:44px}
+.payment-confirm:disabled{opacity:.65;cursor:wait}
+.payment-demo{text-align:center;color:#4f675a;font-size:8px;margin-top:9px}
+@media(max-width:560px){
+ .payment-head h2{font-size:21px}
+ .payment-slip-summary{padding:12px}
+ .provider-grid{grid-template-columns:1fr}
+ .provider-card{min-height:56px}
+}
