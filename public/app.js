@@ -4,6 +4,7 @@ const icons={
   document:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12h6M9 15.5h6"/></svg>`,
   user:`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.7-3.4 3-5.1 6.5-5.1s5.8 1.7 6.5 5.1"/></svg>`,
   headset:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><path d="M4 13h3v6H5a1 1 0 0 1-1-1zM20 13h-3v6h2a1 1 0 0 0 1-1z"/><path d="M17 19c-1 .9-2.2 1.5-4 1.5"/></svg>`,
+  payment:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6" width="17" height="13" rx="2"/><path d="M3.5 10h17M7 15h3"/></svg>`,
   logout:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"/><path d="m14 8 4 4-4 4M18 12H9"/></svg>`,
   arrow:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>`,
   check:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>`,
@@ -456,7 +457,63 @@ function purchaseCard(p){
   </article>`;
 }
 
-async function adminPage(){if(me.role!=="admin")return homePage();const [o,s]=await Promise.all([api("/api/admin/overview"),api("/api/admin/slips")]);app.innerHTML=`<div class="container page"><div class="eyebrow">ADMIN</div><h2>EDM Control Center</h2><div class="admin-grid" style="margin:20px 0"><div class="stat"><b>${o.users}</b><span>USERS</span></div><div class="stat"><b>${o.slips}</b><span>SLIPS</span></div><div class="stat"><b>${o.purchases}</b><span>PAID PURCHASES</span></div><div class="stat"><b>${money(o.revenue)}</b><span>REVENUE</span></div></div><div class="card" style="padding:20px"><div class="section-head"><div><h2>Slip Management</h2><p>Publish or hide premium slips.</p></div><button class="green-btn" style="width:auto" onclick="newSlip()">+ New Slip</button></div><table class="table"><thead><tr><th>Title</th><th>Price</th><th>Odds</th><th>Status</th><th></th></tr></thead><tbody>${s.slips.map(x=>`<tr><td>${x.title}</td><td>${money(x.price_tzs)}</td><td>${x.odds}</td><td>${x.status}</td><td><button class="ghost" onclick="toggleSlip(${x.id},'${x.status==="active"?"hidden":"active"}')">${x.status==="active"?"Hide":"Publish"}</button></td></tr>`).join("")}</tbody></table></div></div>`}
+async function adminPage(){
+  const d=await api("/api/admin/overview");
+  const slips=d.slips||[], users=d.users||[], payments=d.payments||[], purchases=d.purchases||[];
+  app.innerHTML=`<div class="admin-page-v17"><div class="container">
+    <section class="admin-hero-v17">
+      <div><div class="eyebrow">EDM CONTROL CENTER</div><h1>Admin <span>Dashboard</span></h1><p>Manage premium slips, members, payments and purchases.</p></div>
+      <span class="admin-live-v17">● SYSTEM ONLINE</span>
+    </section>
+
+    <section class="admin-stats-v17">
+      <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.ticket}</span><small>PREMIUM SLIPS</small><b>${slips.length}</b><em>Available</em></div>
+      <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.user}</span><small>MEMBERS</small><b>${users.length}</b><em>Registered users</em></div>
+      <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.payment}</span><small>PAYMENTS</small><b>${payments.length}</b><em>Recorded</em></div>
+      <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.check}</span><small>PURCHASES</small><b>${purchases.length}</b><em>Verified access</em></div>
+    </section>
+
+    <section class="admin-section-v17">
+      <div class="admin-section-head-v17"><div><span class="detail-label">PREMIUM CATALOG</span><h2>Manage Bet Slips</h2></div><button class="green-btn admin-add-btn-v17" onclick="adminNewSlip()">+ ADD PREMIUM SLIP</button></div>
+      <div class="admin-table-wrap-v17 card"><table class="admin-table-v17"><thead><tr><th>SLIP</th><th>LEAGUE</th><th>PICKS</th><th>ODDS</th><th>PRICE</th><th>STATUS</th><th>ACTION</th></tr></thead>
+      <tbody>${slips.map(s=>`<tr><td><b>${s.title}</b></td><td>${s.league}</td><td>${s.match_count}</td><td>${s.odds}</td><td>${money(s.price_tzs)} TZS</td><td><span class="admin-status ${s.active?"on":"off"}">${s.active?"ACTIVE":"HIDDEN"}</span></td><td><button class="table-btn" onclick="adminToggleSlip(${s.id},${s.active?0:1})">${s.active?"HIDE":"ACTIVATE"}</button></td></tr>`).join("")||`<tr><td colspan="7" class="admin-empty-cell">No premium slips found.</td></tr>`}</tbody></table></div>
+    </section>
+
+    <section class="admin-two-col-v17">
+      <div class="admin-section-v17">
+        <div class="admin-section-head-v17"><div><span class="detail-label">RECENT PURCHASES</span><h2>Payment Activity</h2></div></div>
+        <div class="card admin-list-v17">${purchases.slice(0,8).map(p=>`<div class="admin-row-v17"><div class="admin-row-icon">${icons.payment}</div><div><b>${p.title||"Premium Slip"}</b><small>${p.provider||"Mobile Money"} • ${p.created_at?new Date(p.created_at).toLocaleDateString("en-GB"):"—"}</small></div><strong>${money(p.amount_tzs||p.price_tzs||0)} TZS</strong></div>`).join("")||`<div class="admin-empty-v17">No purchases yet.</div>`}</div>
+      </div>
+      <div class="admin-section-v17">
+        <div class="admin-section-head-v17"><div><span class="detail-label">MEMBERS</span><h2>Recent Users</h2></div></div>
+        <div class="card admin-list-v17">${users.slice(0,8).map(u=>`<div class="admin-row-v17"><div class="admin-user-avatar">${(u.name||u.email||"U").slice(0,1).toUpperCase()}</div><div><b>${u.name||"EDM Member"}</b><small>${u.email||"—"}</small></div><span class="admin-role-v17">${u.role||"member"}</span></div>`).join("")||`<div class="admin-empty-v17">No users yet.</div>`}</div>
+      </div>
+    </section>
+
+    <div class="admin-security-v17 card">${icons.shield}<div><b>Admin access protected</b><p>Only accounts with the admin role can access this control center. Keep admin credentials private.</p></div></div>
+  </div></div>`;
+}
+async function adminToggleSlip(id,active){
+  try{await api(`/api/admin/slips/${id}/status`,{method:"POST",body:JSON.stringify({active:!!active})});await adminPage()}catch(e){openModal(`<div class="error">${e.message}</div>`)}
+}
+function adminNewSlip(){
+  openModal(`<div class="admin-form-v17"><div class="eyebrow">PREMIUM CATALOG</div><h2>Add Premium Slip</h2>
+    <input class="input" id="aTitle" placeholder="Slip title">
+    <input class="input" id="aLeague" placeholder="League / category">
+    <input class="input" id="aDesc" placeholder="Short description">
+    <div class="admin-form-row"><input class="input" id="aCount" type="number" min="1" placeholder="Selections"><input class="input" id="aOdds" type="number" step="0.01" placeholder="Total odds"></div>
+    <input class="input" id="aPrice" type="number" min="0" placeholder="Price (TZS)">
+    <button class="green-btn" onclick="adminCreateSlip()">CREATE SLIP</button>
+  </div>`);
+}
+async function adminCreateSlip(){
+  try{
+    const body={title:document.querySelector("#aTitle").value.trim(),league:document.querySelector("#aLeague").value.trim(),description:document.querySelector("#aDesc").value.trim(),match_count:Number(document.querySelector("#aCount").value),odds:Number(document.querySelector("#aOdds").value),price_tzs:Number(document.querySelector("#aPrice").value)};
+    await api("/api/admin/slips",{method:"POST",body:JSON.stringify(body)});
+    closeModal();await adminPage();
+  }catch(e){modalBody.innerHTML+=`<div class="error">${e.message}</div>`}
+}
+
 function newSlip(){openModal(`<div class="eyebrow">ADMIN</div><h2>New Premium Slip</h2><input class="input" id="st" placeholder="Title"><input class="input" id="sl" placeholder="League"><input class="input" id="sm" type="number" placeholder="Match count"><input class="input" id="so" type="number" step=".01" placeholder="Total odds"><input class="input" id="sp" type="number" placeholder="Price TZS"><input class="input" id="sd" placeholder="Description"><button class="green-btn" onclick="createSlip()">Create</button>`)}
 async function createSlip(){try{await api("/api/admin/slips",{method:"POST",body:JSON.stringify({title:st.value,league:sl.value,match_count:sm.value,odds:so.value,price_tzs:sp.value,description:sd.value})});closeModal();adminPage()}catch(e){alert(e.message)}}
 async function toggleSlip(id,status){try{await api(`/api/admin/slips/${id}/status`,{method:"PATCH",body:JSON.stringify({status})});adminPage()}catch(e){alert(e.message)}}

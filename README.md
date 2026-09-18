@@ -49,3 +49,5 @@ UI v14: Slip Details / Unlock page with locked picks, secure purchase panel, ver
 UI v15: My Purchases page redesigned with verified purchase cards, payment/date metadata, secure slip access, and responsive empty state.
 
 UI v16: Member Account page redesigned with profile information, verified status, purchase summary, security panel, and account actions.
+
+UI v17: Admin Control Center redesigned with stats, premium slip management, activate/hide controls, payment activity, recent members, and add-slip modal.
