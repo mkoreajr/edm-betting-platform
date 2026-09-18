@@ -39,3 +39,5 @@ UI fix v9: removed the duplicate legacy header brand so the new EDM navigation a
 UI fix v10: updated Bayern Munich hot-match logo to the current 2024 Wikimedia Commons SVG URL and added a fallback image handler.
 
 UI v11: mobile top-bar navigation is collapsed into a hamburger menu; opening the menu reveals Home, Premium Picks, My Purchases, Account and Support, and selecting an item closes the menu automatically.
+
+UI v12: Premium Picks page redesigned with premium cards, protected-selection preview, pricing/stats, secure-access notice, and mobile responsive layout.

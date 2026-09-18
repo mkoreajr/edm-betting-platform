@@ -4,6 +4,8 @@ const icons={
   document:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12h6M9 15.5h6"/></svg>`,
   user:`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.7-3.4 3-5.1 6.5-5.1s5.8 1.7 6.5 5.1"/></svg>`,
   headset:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><path d="M4 13h3v6H5a1 1 0 0 1-1-1zM20 13h-3v6h2a1 1 0 0 0 1-1z"/><path d="M17 19c-1 .9-2.2 1.5-4 1.5"/></svg>`,
+  lock:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v3"/></svg>`,
+  shield:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 19 6v5.2c0 4.7-2.8 7.9-7 9.8-4.2-1.9-7-5.1-7-9.8V6l7-2.5Z"/><path d="m9 12 2 2 4-4"/></svg>`,
   profile:`<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21"/><circle cx="24" cy="18" r="5.2"/><path d="M13.5 36c1.2-5.3 4.8-8 10.5-8s9.3 2.7 10.5 8"/></svg>`
 };
 const app=document.querySelector("#app"), nav=document.querySelector("#nav"), modal=document.querySelector("#modal"), modalBody=document.querySelector("#modalBody");
@@ -200,8 +202,64 @@ async function homePage(){
   </footer>
  </div>`;
 }
-function slipCard(s){return `<div class="card slip"><span class="badge">PREMIUM</span><h3>${s.title}</h3><div class="muted">${s.league} • ${s.match_count} selections</div><div class="price">${money(s.price_tzs)} <small>• total odds ${s.odds}</small></div><p class="muted">${s.description}</p><div class="locked">🔒 Picks & slip code are protected until payment.</div><button class="green-btn" style="margin-top:14px" onclick="buy(${s.id})">VIEW & UNLOCK</button></div>`}
-async function slipsPage(){const {slips}=await api("/api/slips");app.innerHTML=`<div class="container page"><div class="section-head"><div><div class="eyebrow">EDM PREMIUM</div><h2>Premium Bet Slips</h2><p>Choose a package and unlock it through the secure payment flow.</p></div></div><div class="slips">${slips.map(slipCard).join("")}</div></div>`}
+function slipCard(s){
+  return `<article class="premium-slip-card card">
+    <div class="premium-card-head">
+      <span class="premium-label">PREMIUM</span>
+      <span class="premium-lock">${icons.lock} LOCKED</span>
+    </div>
+    <div class="premium-card-title">
+      <div>
+        <span class="premium-kicker">${s.league}</span>
+        <h3>${s.title}</h3>
+      </div>
+      <div class="premium-price">${money(s.price_tzs)}<small>TZS</small></div>
+    </div>
+    <p class="premium-desc">${s.description}</p>
+    <div class="premium-stats">
+      <div><span>SELECTIONS</span><b>${s.match_count}</b></div>
+      <div><span>TOTAL ODDS</span><b>${s.odds}</b></div>
+      <div><span>ACCESS</span><b>24/7</b></div>
+    </div>
+    <div class="locked-preview">
+      <div class="locked-row"><span>${icons.lock}</span><span>Match selections protected</span><b>••••••</b></div>
+      <div class="locked-row"><span>${icons.lock}</span><span>Bet slip code protected</span><b>••••••</b></div>
+    </div>
+    <div class="premium-card-actions">
+      <button class="ghost premium-view" onclick="go('detail',${s.id})">VIEW SLIP</button>
+      <button class="green-btn premium-unlock" onclick="buy(${s.id})">UNLOCK NOW</button>
+    </div>
+  </article>`
+}
+async function slipsPage(){
+  const {slips}=await api("/api/slips");
+  app.innerHTML=`<div class="premium-page">
+    <div class="container">
+      <section class="premium-hero">
+        <div>
+          <div class="eyebrow">EDM PREMIUM PICKS</div>
+          <h1>Premium <span>Bet Slips</span></h1>
+          <p>Access carefully prepared football selections after payment verification.</p>
+        </div>
+        <div class="premium-hero-badge"><span>${icons.shield}</span><div><b>SECURE ACCESS</b><small>Picks stay hidden until verified</small></div></div>
+      </section>
+
+      <div class="premium-toolbar">
+        <div><b>${slips.length}</b> premium slips available</div>
+        <div class="premium-filter"><span>ALL PICKS</span><span>LOCKED</span></div>
+      </div>
+
+      <section class="premium-grid">
+        ${slips.map(slipCard).join("")}
+      </section>
+
+      <section class="premium-info card">
+        <div class="premium-info-icon">${icons.shield}</div>
+        <div><h3>Protected Premium Access</h3><p>Your picks and final slip code are returned by the server only after a verified purchase. Payment in this build is currently DEMO until a live provider is connected.</p></div>
+      </section>
+    </div>
+  </div>`
+}
 async function detailPage(id){try{const d=await api(`/api/slips/${id}`);app.innerHTML=`<div class="container page"><div class="detail"><span class="badge">PREMIUM SLIP</span><h1>${d.slip.title}</h1><p class="muted">${d.slip.league} • ${d.slip.match_count} selections • total odds ${d.slip.odds}</p><div class="card" style="padding:22px;margin-top:20px"><p>${d.slip.description}</p><div class="locked">🔒 Individual picks and the final slip code are withheld from this response until payment is verified.</div><div class="price">${money(d.slip.price_tzs)}</div><button class="green-btn" onclick="buy(${id})">PAY & UNLOCK</button></div></div></div>`}catch(e){app.innerHTML=`<div class="container page"><div class="empty">${e.message}</div></div>`}}
 function buy(id){openModal(`<div class="eyebrow">SECURE PURCHASE</div><h2>Unlock Premium Slip</h2><p class="muted">Select a payment method. This build uses DEMO confirmation until a real payment provider is connected.</p><select class="input" id="provider"><option>M-Pesa</option><option>Airtel Money</option><option>Tigo Pesa</option></select><button class="green-btn" onclick="confirmDemo(${id})">CONFIRM DEMO PAYMENT</button>`)}
 async function confirmDemo(id){try{await api("/api/payments/demo-confirm",{method:"POST",body:JSON.stringify({slipId:id,provider:document.querySelector("#provider").value})});closeModal();await unlock(id)}catch(e){modalBody.innerHTML+=`<div class="error">${e.message}</div>`}}
