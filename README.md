@@ -30,3 +30,6 @@ Demo accounts:
 The current payment button is deliberately DEMO mode. Before accepting real money, connect a Tanzanian mobile-money/payment provider and verify payment server-side through its webhook/API. Never trust a browser-only "paid" flag.
 
 For production also use HTTPS, a managed PostgreSQL database or another durable DB, strong secrets, CSRF protection appropriate to the deployment, audit logs, backups, and provider-specific reconciliation/webhooks.
+
+
+UI update: EDM top navigation redesigned to match the supplied reference, with inline SVG icons and responsive layout.

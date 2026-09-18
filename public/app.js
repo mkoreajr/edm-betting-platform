@@ -1,3 +1,11 @@
+const icons={
+  home:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10.5 12 3l8.5 7.5v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1v-9Z"/><path d="M9.5 20.5h5"/></svg>`,
+  ticket:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v13H4z"/><path d="M8 8.5h8M8 12h6M8 15.5h4"/></svg>`,
+  document:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12h6M9 15.5h6"/></svg>`,
+  user:`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.7-3.4 3-5.1 6.5-5.1s5.8 1.7 6.5 5.1"/></svg>`,
+  headset:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><path d="M4 13h3v6H5a1 1 0 0 1-1-1zM20 13h-3v6h2a1 1 0 0 0 1-1z"/><path d="M17 19c-1 .9-2.2 1.5-4 1.5"/></svg>`,
+  profile:`<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21"/><circle cx="24" cy="18" r="5.2"/><path d="M13.5 36c1.2-5.3 4.8-8 10.5-8s9.3 2.7 10.5 8"/></svg>`
+};
 const app=document.querySelector("#app"), nav=document.querySelector("#nav"), modal=document.querySelector("#modal"), modalBody=document.querySelector("#modalBody");
 let me=null;
 
@@ -6,9 +14,37 @@ async function api(url,opt={}){const r=await fetch(url,{headers:{"Content-Type":
 function closeModal(){modal.classList.add("hidden")}
 function openModal(html){modalBody.innerHTML=html;modal.classList.remove("hidden")}
 function navRender(){
-  nav.innerHTML=me
-   ? `<button class="nav-btn" onclick="go('home')">Home</button><button class="nav-btn" onclick="go('slips')">Premium</button><button class="nav-btn" onclick="go('purchases')">Purchases</button>${me.role==="admin"?`<button class="nav-btn" onclick="go('admin')">Admin</button>`:""}<button class="nav-btn" onclick="logout()">Logout</button>`
-   : "";
+  nav.innerHTML=me ? `
+    <div class="edm-nav-left">
+      <button class="nav-brand" onclick="go('home')" aria-label="EDM Home">
+        <span class="nav-edm">EDM</span>
+        <span class="nav-brand-divider"></span>
+        <span class="nav-platform">BETTING PLATFORM</span>
+      </button>
+      <div class="edm-nav-links">
+        <button class="nav-btn nav-home" onclick="go('home')">
+          <span class="nav-icon">${icons.home}</span><span>Home</span>
+        </button>
+        <button class="nav-btn" onclick="go('slips')">
+          <span class="nav-icon">${icons.ticket}</span><span>Premium Picks</span>
+        </button>
+        <button class="nav-btn" onclick="go('purchases')">
+          <span class="nav-icon">${icons.document}</span><span>My Purchases</span>
+        </button>
+        <button class="nav-btn" onclick="go('account')">
+          <span class="nav-icon">${icons.user}</span><span>Account</span>
+        </button>
+        <button class="nav-btn" onclick="go('support')">
+          <span class="nav-icon">${icons.headset}</span><span>Support</span>
+        </button>
+      </div>
+    </div>
+    <div class="edm-nav-right">
+      <div class="nav-tagline">PREDICT • PLAY • WIN</div>
+      <button class="profile-btn" onclick="go('${me.role==="admin"?"admin":"account"}')" aria-label="Account">
+        ${icons.profile}
+      </button>
+    </div>` : "";
 }
 async function boot(){try{me=(await api("/api/me")).user}catch{}navRender();go(me?"home":"login")}
 function go(page,id){location.hash=page+(id?`/${id}`:"");render(page,id)}
@@ -20,6 +56,8 @@ async function render(page,id){
   if(page==="slips") return slipsPage();
   if(page==="detail") return detailPage(id);
   if(page==="purchases") return purchasesPage();
+  if(page==="account") return accountPage();
+  if(page==="support") return supportPage();
   if(page==="admin") return adminPage();
   return homePage();
 }
@@ -124,6 +162,29 @@ async function detailPage(id){try{const d=await api(`/api/slips/${id}`);app.inne
 function buy(id){openModal(`<div class="eyebrow">SECURE PURCHASE</div><h2>Unlock Premium Slip</h2><p class="muted">Select a payment method. This build uses DEMO confirmation until a real payment provider is connected.</p><select class="input" id="provider"><option>M-Pesa</option><option>Airtel Money</option><option>Tigo Pesa</option></select><button class="green-btn" onclick="confirmDemo(${id})">CONFIRM DEMO PAYMENT</button>`)}
 async function confirmDemo(id){try{await api("/api/payments/demo-confirm",{method:"POST",body:JSON.stringify({slipId:id,provider:document.querySelector("#provider").value})});closeModal();await unlock(id)}catch(e){modalBody.innerHTML+=`<div class="error">${e.message}</div>`}}
 async function unlock(id){try{const d=await api(`/api/slips/${id}/unlock`);app.innerHTML=`<div class="container page"><div class="detail"><span class="badge">UNLOCKED</span><h1>${d.slip.title}</h1><div class="notice">Payment verified • Reference: ${d.purchase.reference}</div><div class="card" style="padding:22px"><p><b>Slip Code:</b> <span style="color:var(--green)">${d.slipCode}</span></p>${d.picks.map(p=>`<div class="pick"><span>${p.match}</span><b>${p.pick} · ${p.odds}</b></div>`).join("")}</div></div></div>`}catch(e){go("detail",id)}}
+function accountPage(){
+  app.innerHTML=`<div class="container page account-page">
+    <div class="eyebrow">ACCOUNT</div>
+    <h2>My Account</h2>
+    <div class="card account-card">
+      <div class="account-avatar">${(me.name||"U").charAt(0).toUpperCase()}</div>
+      <div><h3>${me.name}</h3><p class="muted">${me.email}</p><span class="account-status">ACTIVE MEMBER</span></div>
+    </div>
+    <button class="green-btn account-logout" onclick="logout()">LOG OUT</button>
+  </div>`;
+}
+function supportPage(){
+  app.innerHTML=`<div class="container page support-page">
+    <div class="eyebrow">EDM SUPPORT</div>
+    <h2>How can we help?</h2>
+    <div class="support-grid">
+      <div class="card support-card"><b>Premium Picks</b><p class="muted">Need help accessing a purchased slip?</p></div>
+      <div class="card support-card"><b>Payments</b><p class="muted">For payment issues, contact EDM support.</p></div>
+      <div class="card support-card"><b>Account</b><p class="muted">For login or account assistance, reach out to support.</p></div>
+    </div>
+  </div>`;
+}
+
 async function purchasesPage(){const {purchases}=await api("/api/purchases");app.innerHTML=`<div class="container page"><div class="section-head"><div><div class="eyebrow">ACCOUNT</div><h2>My Purchases</h2><p>Your verified premium purchases.</p></div></div>${purchases.length?`<div class="card" style="padding:10px"><table class="table"><thead><tr><th>Slip</th><th>Amount</th><th>Provider</th><th>Status</th><th></th></tr></thead><tbody>${purchases.map(p=>`<tr><td>${p.title}</td><td>${money(p.amount_tzs)}</td><td>${p.provider}</td><td>${p.status}</td><td><button class="ghost" onclick="unlock(${p.slip_id})">Open</button></td></tr>`).join("")}</tbody></table></div>`:`<div class="empty">No purchases yet.</div>`}</div>`}
 async function adminPage(){if(me.role!=="admin")return homePage();const [o,s]=await Promise.all([api("/api/admin/overview"),api("/api/admin/slips")]);app.innerHTML=`<div class="container page"><div class="eyebrow">ADMIN</div><h2>EDM Control Center</h2><div class="admin-grid" style="margin:20px 0"><div class="stat"><b>${o.users}</b><span>USERS</span></div><div class="stat"><b>${o.slips}</b><span>SLIPS</span></div><div class="stat"><b>${o.purchases}</b><span>PAID PURCHASES</span></div><div class="stat"><b>${money(o.revenue)}</b><span>REVENUE</span></div></div><div class="card" style="padding:20px"><div class="section-head"><div><h2>Slip Management</h2><p>Publish or hide premium slips.</p></div><button class="green-btn" style="width:auto" onclick="newSlip()">+ New Slip</button></div><table class="table"><thead><tr><th>Title</th><th>Price</th><th>Odds</th><th>Status</th><th></th></tr></thead><tbody>${s.slips.map(x=>`<tr><td>${x.title}</td><td>${money(x.price_tzs)}</td><td>${x.odds}</td><td>${x.status}</td><td><button class="ghost" onclick="toggleSlip(${x.id},'${x.status==="active"?"hidden":"active"}')">${x.status==="active"?"Hide":"Publish"}</button></td></tr>`).join("")}</tbody></table></div></div>`}
 function newSlip(){openModal(`<div class="eyebrow">ADMIN</div><h2>New Premium Slip</h2><input class="input" id="st" placeholder="Title"><input class="input" id="sl" placeholder="League"><input class="input" id="sm" type="number" placeholder="Match count"><input class="input" id="so" type="number" step=".01" placeholder="Total odds"><input class="input" id="sp" type="number" placeholder="Price TZS"><input class="input" id="sd" placeholder="Description"><button class="green-btn" onclick="createSlip()">Create</button>`)}
