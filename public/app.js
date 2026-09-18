@@ -4,6 +4,7 @@ const icons={
   document:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12h6M9 15.5h6"/></svg>`,
   user:`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.7-3.4 3-5.1 6.5-5.1s5.8 1.7 6.5 5.1"/></svg>`,
   headset:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><path d="M4 13h3v6H5a1 1 0 0 1-1-1zM20 13h-3v6h2a1 1 0 0 0 1-1z"/><path d="M17 19c-1 .9-2.2 1.5-4 1.5"/></svg>`,
+  arrow:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>`,
   check:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>`,
   copy:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"/></svg>`,
   lock:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v3"/></svg>`,
@@ -384,7 +385,40 @@ function supportPage(){
   </div>`;
 }
 
-async function purchasesPage(){const {purchases}=await api("/api/purchases");app.innerHTML=`<div class="container page"><div class="section-head"><div><div class="eyebrow">ACCOUNT</div><h2>My Purchases</h2><p>Your verified premium purchases.</p></div></div>${purchases.length?`<div class="card" style="padding:10px"><table class="table"><thead><tr><th>Slip</th><th>Amount</th><th>Provider</th><th>Status</th><th></th></tr></thead><tbody>${purchases.map(p=>`<tr><td>${p.title}</td><td>${money(p.amount_tzs)}</td><td>${p.provider}</td><td>${p.status}</td><td><button class="ghost" onclick="unlock(${p.slip_id})">Open</button></td></tr>`).join("")}</tbody></table></div>`:`<div class="empty">No purchases yet.</div>`}</div>`}
+async function purchasesPage(){
+  const d=await api("/api/purchases");
+  const purchases=d.purchases||[];
+  app.innerHTML=`<div class="purchases-page"><div class="container">
+    <section class="purchases-hero">
+      <div><div class="eyebrow">EDM MEMBER AREA</div><h1>My <span>Purchases</span></h1><p>All your verified premium slips in one secure place.</p></div>
+      <div class="purchase-count"><b>${purchases.length}</b><span>VERIFIED<br>PURCHASES</span></div>
+    </section>
+    ${purchases.length ? `<section class="purchase-list">${purchases.map(purchaseCard).join("")}</section>` : `
+      <section class="empty-purchases card">
+        <div class="empty-icon">${icons.document}</div>
+        <h2>No purchases yet</h2>
+        <p>You haven't unlocked any premium bet slips yet. Browse the available picks and make your first purchase.</p>
+        <button class="green-btn" onclick="go('slips')">BROWSE PREMIUM PICKS</button>
+      </section>`}
+  </div></div>`;
+}
+function purchaseCard(p){
+  const date=p.created_at ? new Date(p.created_at).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "—";
+  return `<article class="purchase-card card">
+    <div class="purchase-main">
+      <div class="purchase-slip-icon">${icons.ticket}</div>
+      <div class="purchase-title"><span class="purchase-kicker">${p.league||"EDM PREMIUM"}</span><h3>${p.title}</h3><small>${p.match_count||0} selections • Total odds ${p.odds||"—"}</small></div>
+    </div>
+    <div class="purchase-meta">
+      <div><span>DATE</span><b>${date}</b></div>
+      <div><span>AMOUNT</span><b>${money(p.amount_tzs||p.price_tzs||0)} TZS</b></div>
+      <div><span>PAYMENT</span><b>${p.provider||"Mobile Money"}</b></div>
+      <div><span>STATUS</span><b class="paid-status">✓ VERIFIED</b></div>
+    </div>
+    <button class="ghost purchase-view" onclick="go('detail',${p.slip_id||p.id})">VIEW SLIP ${icons.arrow}</button>
+  </article>`;
+}
+
 async function adminPage(){if(me.role!=="admin")return homePage();const [o,s]=await Promise.all([api("/api/admin/overview"),api("/api/admin/slips")]);app.innerHTML=`<div class="container page"><div class="eyebrow">ADMIN</div><h2>EDM Control Center</h2><div class="admin-grid" style="margin:20px 0"><div class="stat"><b>${o.users}</b><span>USERS</span></div><div class="stat"><b>${o.slips}</b><span>SLIPS</span></div><div class="stat"><b>${o.purchases}</b><span>PAID PURCHASES</span></div><div class="stat"><b>${money(o.revenue)}</b><span>REVENUE</span></div></div><div class="card" style="padding:20px"><div class="section-head"><div><h2>Slip Management</h2><p>Publish or hide premium slips.</p></div><button class="green-btn" style="width:auto" onclick="newSlip()">+ New Slip</button></div><table class="table"><thead><tr><th>Title</th><th>Price</th><th>Odds</th><th>Status</th><th></th></tr></thead><tbody>${s.slips.map(x=>`<tr><td>${x.title}</td><td>${money(x.price_tzs)}</td><td>${x.odds}</td><td>${x.status}</td><td><button class="ghost" onclick="toggleSlip(${x.id},'${x.status==="active"?"hidden":"active"}')">${x.status==="active"?"Hide":"Publish"}</button></td></tr>`).join("")}</tbody></table></div></div>`}
 function newSlip(){openModal(`<div class="eyebrow">ADMIN</div><h2>New Premium Slip</h2><input class="input" id="st" placeholder="Title"><input class="input" id="sl" placeholder="League"><input class="input" id="sm" type="number" placeholder="Match count"><input class="input" id="so" type="number" step=".01" placeholder="Total odds"><input class="input" id="sp" type="number" placeholder="Price TZS"><input class="input" id="sd" placeholder="Description"><button class="green-btn" onclick="createSlip()">Create</button>`)}
 async function createSlip(){try{await api("/api/admin/slips",{method:"POST",body:JSON.stringify({title:st.value,league:sl.value,match_count:sm.value,odds:so.value,price_tzs:sp.value,description:sd.value})});closeModal();adminPage()}catch(e){alert(e.message)}}
