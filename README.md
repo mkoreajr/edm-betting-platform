@@ -47,3 +47,5 @@ UI v13: Premium slip checkout modal redesigned with mobile-money provider cards,
 UI v14: Slip Details / Unlock page with locked picks, secure purchase panel, verified unlocked picks, odds and copyable bet slip code.
 
 UI v15: My Purchases page redesigned with verified purchase cards, payment/date metadata, secure slip access, and responsive empty state.
+
+UI v16: Member Account page redesigned with profile information, verified status, purchase summary, security panel, and account actions.

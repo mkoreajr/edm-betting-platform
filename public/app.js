@@ -4,6 +4,7 @@ const icons={
   document:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12h6M9 15.5h6"/></svg>`,
   user:`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.7-3.4 3-5.1 6.5-5.1s5.8 1.7 6.5 5.1"/></svg>`,
   headset:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><path d="M4 13h3v6H5a1 1 0 0 1-1-1zM20 13h-3v6h2a1 1 0 0 0 1-1z"/><path d="M17 19c-1 .9-2.2 1.5-4 1.5"/></svg>`,
+  logout:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"/><path d="m14 8 4 4-4 4M18 12H9"/></svg>`,
   arrow:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>`,
   check:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>`,
   copy:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"/></svg>`,
@@ -362,16 +363,52 @@ async function confirmDemo(id){
   }
 }
 async function unlock(id){try{const d=await api(`/api/slips/${id}/unlock`);app.innerHTML=`<div class="container page"><div class="detail"><span class="badge">UNLOCKED</span><h1>${d.slip.title}</h1><div class="notice">Payment verified • Reference: ${d.purchase.reference}</div><div class="card" style="padding:22px"><p><b>Slip Code:</b> <span style="color:var(--green)">${d.slipCode}</span></p>${d.picks.map(p=>`<div class="pick"><span>${p.match}</span><b>${p.pick} · ${p.odds}</b></div>`).join("")}</div></div></div>`}catch(e){go("detail",id)}}
-function accountPage(){
-  app.innerHTML=`<div class="container page account-page">
-    <div class="eyebrow">ACCOUNT</div>
-    <h2>My Account</h2>
-    <div class="card account-card">
-      <div class="account-avatar">${(me.name||"U").charAt(0).toUpperCase()}</div>
-      <div><h3>${me.name}</h3><p class="muted">${me.email}</p><span class="account-status">ACTIVE MEMBER</span></div>
-    </div>
-    <button class="green-btn account-logout" onclick="logout()">LOG OUT</button>
-  </div>`;
+async function accountPage(){
+  const d=await api("/api/purchases");
+  const purchases=d.purchases||[];
+  const total=purchases.reduce((sum,p)=>sum+Number(p.amount_tzs||p.price_tzs||0),0);
+  const initials=(me.name||me.email||"U").slice(0,1).toUpperCase();
+  app.innerHTML=`<div class="account-page-v16"><div class="container">
+    <section class="account-hero-v16">
+      <div><div class="eyebrow">EDM MEMBER ACCOUNT</div><h1>My <span>Account</span></h1><p>Manage your member profile and premium access.</p></div>
+      <div class="member-badge-v16"><div class="member-avatar-v16">${initials}</div><div><b>EDM MEMBER</b><small>Account active</small></div></div>
+    </section>
+
+    <section class="account-grid-v16">
+      <div class="card profile-card-v16">
+        <div class="card-title-v16"><span class="detail-label">PROFILE INFORMATION</span><span class="verified-chip">${icons.check} VERIFIED</span></div>
+        <div class="profile-main-v16">
+          <div class="large-avatar-v16">${initials}</div>
+          <div><h2>${me.name||"EDM Member"}</h2><p>${me.email||"—"}</p><span class="role-chip">${me.role==="admin"?"ADMIN":"MEMBER"}</span></div>
+        </div>
+        <div class="profile-fields-v16">
+          <div><span>FULL NAME</span><b>${me.name||"—"}</b></div>
+          <div><span>EMAIL ADDRESS</span><b>${me.email||"—"}</b></div>
+          <div><span>ACCOUNT STATUS</span><b class="green-text">● ACTIVE</b></div>
+          <div><span>ACCESS LEVEL</span><b>${me.role==="admin"?"Administrator":"Premium Member"}</b></div>
+        </div>
+      </div>
+
+      <aside class="card account-stats-v16">
+        <span class="detail-label">MEMBER SUMMARY</span>
+        <div class="account-stat-v16"><div class="stat-icon-v16">${icons.ticket}</div><div><small>PREMIUM SLIPS</small><b>${purchases.length}</b></div></div>
+        <div class="account-stat-v16"><div class="stat-icon-v16">${icons.check}</div><div><small>VERIFIED PURCHASES</small><b>${purchases.length}</b></div></div>
+        <div class="account-stat-v16"><div class="stat-icon-v16">${icons.document}</div><div><small>TOTAL SPEND</small><b>${money(total)} <em>TZS</em></b></div></div>
+        <button class="green-btn account-premium-btn-v16" onclick="go('slips')">BROWSE PREMIUM PICKS</button>
+      </aside>
+    </section>
+
+    <section class="account-security-v16 card">
+      <div class="security-icon-v16">${icons.shield}</div>
+      <div class="security-copy-v16"><span class="detail-label">SECURITY</span><h3>Your premium access is protected</h3><p>Picks and bet slip codes are delivered only after a verified purchase. Your account session is protected by secure authentication.</p></div>
+      <div class="security-status-v16"><span>●</span> ACTIVE</div>
+    </section>
+
+    <section class="account-actions-v16">
+      <button class="ghost" onclick="go('purchases')">${icons.document} MY PURCHASES</button>
+      <button class="ghost logout-account-v16" onclick="logout()">${icons.logout} LOG OUT</button>
+    </section>
+  </div></div>`;
 }
 function supportPage(){
   app.innerHTML=`<div class="container page support-page">
