@@ -80,18 +80,38 @@ async function homePage(){
   </div>
 
   <footer class="site-footer">
-   <div class="container footer-grid">
-    <div class="footer-brand"><div class="footer-logo">EDM</div><div class="footer-sub">BETTING PLATFORM</div><div class="footer-tag">Predict • Play • Win</div><p>Premium football picks, featured fixtures and secure access to the EDM betting platform.</p></div>
-    <div class="footer-col"><h4>Quick Links</h4><button onclick="go('home')">Home</button><button onclick="go('slips')">Premium Picks</button><button onclick="go('purchases')">My Purchases</button><button onclick="go('home')">Account</button><button onclick="go('home')">Support</button></div>
-    <div class="footer-col"><h4>Legal</h4><button>Terms of Service</button><button>Privacy Policy</button><button>Responsible Betting</button><button>Contact Us</button></div>
-    <div class="footer-col footer-follow"><h4>Follow Us</h4><div class="socials">
-      <a class="social whatsapp" aria-label="WhatsApp" href="#" onclick="return false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 3.2 17.1L2 22l5-1.3A11 11 0 1 0 20.5 3.5Zm-8.6 17A9 9 0 0 1 7.3 19l-.3-.2-3 .8.8-2.9-.2-.3a9 9 0 1 1 7.3 4.1Zm4.9-6.7c-.3-.2-1.8-.9-2-.9-.3-.1-.5-.2-.7.2-.2.3-.7.9-.8 1.1-.2.2-.3.2-.6.1-1.6-.8-2.7-1.4-3.8-3.2-.3-.5.3-.5.8-1.6.1-.2 0-.4-.1-.6-.1-.2-.7-1.7-.9-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1-1.1 2.5s1.1 2.9 1.3 3.1c.2.2 2.1 3.3 5.2 4.6 1.9.8 2.6.9 3.5.8.6-.1 1.8-.7 2.1-1.3.3-.6.3-1.2.2-1.3-.1-.1-.3-.2-.6-.4Z" fill="currentColor"/></svg></a>
-      <a class="social telegram" aria-label="Telegram" href="#" onclick="return false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.5 4.3-3.1 14.6c-.2 1-.8 1.2-1.6.8l-4.4-3.2-2.1 2c-.2.2-.4.4-.8.4l.3-4.5 8.2-7.4c.4-.3-.1-.5-.6-.2L7.3 13l-4.3-1.4c-.9-.3-.9-.9.2-1.3L20 4.1c.8-.3 1.6.2 1.5.2Z" fill="currentColor"/></svg></a>
-      <a class="social instagram" aria-label="Instagram" href="#" onclick="return false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.7" r="1.2" fill="currentColor"/></svg></a>
-      <a class="social x-social" aria-label="X" href="#" onclick="return false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h3.8l3.1 4.4L15.6 4H19l-5.5 6.1L19.5 20h-3.8l-3.5-4.9L7.6 20H4.2l5.9-6.6L5 4Zm3.1 1.8H7.2l8.8 12.4h.9L8.1 5.8Z" fill="currentColor"/></svg></a>
-      <a class="social youtube" aria-label="YouTube" href="#" onclick="return false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 7.2a2.7 2.7 0 0 0-1.9-1.9C17.4 4.8 12 4.8 12 4.8s-5.4 0-7.1.5A2.7 2.7 0 0 0 3 7.2 28 28 0 0 0 2.5 12 28 28 0 0 0 3 16.8a2.7 2.7 0 0 0 1.9 1.9c1.7.5 7.1.5 7.1.5s5.4 0 7.1-.5a2.7 2.7 0 0 0 1.9-1.9 28 28 0 0 0 .5-4.8 28 28 0 0 0-.5-4.8Z" fill="currentColor"/><path d="m10 15.5 5-3.5-5-3.5v7Z" fill="#04110a"/></svg></a>
-    </div></div>
-    <div class="footer-col footer-news"><h4>Stay Updated</h4><p>Get the latest fixtures, tips and offers.</p><div class="subscribe"><div class="email-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><input type="email" placeholder="Your email address"></div><button class="subscribe-btn">Subscribe</button></div></div>
+   <div class="footer-social-news container">
+    <section class="footer-follow-panel">
+      <h4>Follow Us</h4>
+      <div class="socials">
+       <a class="social whatsapp" aria-label="WhatsApp" href="#" onclick="return false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 3.2 17.1L2 22l5-1.3A11 11 0 1 0 20.5 3.5Zm-8.6 17A9 9 0 0 1 7.3 19l-.3-.2-3 .8.8-2.9-.2-.3a9 9 0 1 1 7.3 4.1Zm4.9-6.7c-.3-.2-1.8-.9-2-.9-.3-.1-.5-.2-.7.2-.2.3-.7.9-.8 1.1-.2.2-.3.2-.6.1-1.6-.8-2.7-1.4-3.8-3.2-.3-.5.3-.5.8-1.6.1-.2 0-.4-.1-.6-.1-.2-.7-1.7-.9-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1-1.1 2.5s1.1 2.9 1.3 3.1c.2.2 2.1 3.3 5.2 4.6 1.9.8 2.6.9 3.5.8.6-.1 1.8-.7 2.1-1.3.3-.6.3-1.2.2-1.3-.1-.1-.3-.2-.6-.4Z" fill="currentColor"/></svg>
+       </a>
+       <a class="social telegram" aria-label="Telegram" href="#" onclick="return false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.5 4.3-3.1 14.6c-.2 1-.8 1.2-1.6.8l-4.4-3.2-2.1 2c-.2.2-.4.4-.8.4l.3-4.5 8.2-7.4c.4-.3-.1-.5-.6-.2L7.3 13l-4.3-1.4c-.9-.3-.9-.9.2-1.3L20 4.1c.8-.3 1.6.2 1.5.2Z" fill="currentColor"/></svg>
+       </a>
+       <a class="social instagram" aria-label="Instagram" href="#" onclick="return false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.4" y="3.4" width="17.2" height="17.2" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.6" cy="6.6" r="1.2" fill="currentColor"/></svg>
+       </a>
+       <a class="social x-social" aria-label="X" href="#" onclick="return false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h3.8l3.1 4.4L15.6 4H19l-5.5 6.1L19.5 20h-3.8l-3.5-4.9L7.6 20H4.2l5.9-6.6L5 4Zm3.1 1.8H7.2l8.8 12.4h.9L8.1 5.8Z" fill="currentColor"/></svg>
+       </a>
+       <a class="social youtube" aria-label="YouTube" href="#" onclick="return false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 7.2a2.7 2.7 0 0 0-1.9-1.9C17.4 4.8 12 4.8 12 4.8s-5.4 0-7.1.5A2.7 2.7 0 0 0 3 7.2 28 28 0 0 0 2.5 12 28 28 0 0 0 3 16.8a2.7 2.7 0 0 0 1.9 1.9c1.7.5 7.1.5 7.1.5s5.4 0 7.1-.5a2.7 2.7 0 0 0 1.9-1.9 28 28 0 0 0 .5-4.8 28 28 0 0 0-.5-4.8Z" fill="currentColor"/><path d="m10 15.5 5-3.5-5-3.5v7Z" fill="#04110a"/></svg>
+       </a>
+      </div>
+    </section>
+    <section class="footer-news-panel">
+      <h4>Stay Updated</h4>
+      <p>Get the latest fixtures, tips and offers.</p>
+      <div class="subscribe">
+       <div class="email-wrap">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.8" y="5" width="18.4" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="email" placeholder="Your email address" aria-label="Your email address">
+       </div>
+       <button class="subscribe-btn" type="button">Subscribe</button>
+      </div>
+    </section>
    </div>
    <div class="container footer-bottom"><span>© 2026 EDM Betting Platform. All rights reserved.</span><strong>HATUNA NAMNA, HATUNA MADUKA.</strong><span>18+ &nbsp;|&nbsp; Bet Responsibly &nbsp;|&nbsp; Play Smart</span></div>
   </footer>
