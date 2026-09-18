@@ -54,4 +54,5 @@ UI v17: Admin Control Center redesigned with stats, premium slip management, act
 
 Admin v18: admins can edit slip details and add/remove match picks with market, selection and odds. Pick count syncs automatically.
 
-Admin fixed v20: corrected the v18 editor API to use the existing bet_slips/slip_picks schema and existing auth/admin middleware. Added startup admin bootstrap from Railway ADMIN_EMAIL/ADMIN_PASSWORD variables.
+Admin login v19:
+Set ADMIN_EMAIL and ADMIN_PASSWORD as Railway Variables (minimum 8 characters). On startup the server creates the account if missing, or updates the configured account to admin role and the configured password. Do not put real credentials in GitHub.

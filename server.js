@@ -96,25 +96,6 @@ function seed() {
 }
 seed();
 
-// Admin bootstrap v20: configure ADMIN_EMAIL and ADMIN_PASSWORD in Railway Variables.
-// The password is hashed and never stored in plaintext in the database.
-if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
-  const adminEmail = String(process.env.ADMIN_EMAIL).trim().toLowerCase();
-  const adminPassword = String(process.env.ADMIN_PASSWORD);
-  if (adminEmail && adminPassword.length >= 8) {
-    const existingAdmin = db.prepare("SELECT id FROM users WHERE email=?").get(adminEmail);
-    const passwordHash = bcrypt.hashSync(adminPassword, 12);
-    if (existingAdmin) {
-      db.prepare("UPDATE users SET password_hash=?, role='admin' WHERE id=?").run(passwordHash, existingAdmin.id);
-    } else {
-      db.prepare("INSERT INTO users(name,email,password_hash,role) VALUES(?,?,?,'admin')")
-        .run("EDM Admin",adminEmail,passwordHash);
-    }
-  } else {
-    console.warn("ADMIN_EMAIL/ADMIN_PASSWORD are set but ADMIN_PASSWORD must be at least 8 characters.");
-  }
-}
-
 function signUser(user) {
   return jwt.sign({ id: user.id, role: user.role, email: user.email }, JWT_SECRET, { expiresIn: "7d" });
 }
@@ -237,47 +218,39 @@ app.patch("/api/admin/slips/:id/status",auth,admin,(req,res)=>{
 });
 
 
-
-
-// Admin slip editor API — uses the existing bet_slips/slip_picks schema.
-app.get("/api/admin/slips/:id/picks", auth, admin, (req,res)=>{
-  const id=Number(req.params.id);
-  const slip=db.prepare("SELECT id,title,league,description,match_count,odds,price_tzs,status FROM bet_slips WHERE id=?").get(id);
+app.get("/api/admin/slips/:id/picks", requireAuth, requireAdmin, (req,res)=>{
+  const slip=db.prepare("SELECT id,title,league,description,match_count,odds,price_tzs,active FROM slips WHERE id=?").get(Number(req.params.id));
   if(!slip) return res.status(404).json({error:"Slip not found"});
-  const picks=db.prepare("SELECT id,match,pick,odds FROM slip_picks WHERE slip_id=? ORDER BY id").all(id);
+  const picks=db.prepare("SELECT id,match,market,selection,odd FROM picks WHERE slip_id=? ORDER BY id").all(Number(req.params.id));
   res.json({slip,picks});
 });
-app.post("/api/admin/slips/:id/picks", auth, admin, (req,res)=>{
+app.post("/api/admin/slips/:id/picks", requireAuth, requireAdmin, (req,res)=>{
   const slipId=Number(req.params.id);
-  const slip=db.prepare("SELECT id FROM bet_slips WHERE id=?").get(slipId);
+  const slip=db.prepare("SELECT id FROM slips WHERE id=?").get(slipId);
   if(!slip) return res.status(404).json({error:"Slip not found"});
-  const {match,pick,odds}=req.body||{};
-  if(!String(match||"").trim() || !String(pick||"").trim() || !(Number(odds)>0))
-    return res.status(400).json({error:"Match, pick and valid odds are required"});
-  const info=db.prepare("INSERT INTO slip_picks(slip_id,match,pick,odds) VALUES(?,?,?,?)")
-    .run(slipId,String(match).trim(),String(pick).trim(),Number(odds));
-  const count=db.prepare("SELECT COUNT(*) c FROM slip_picks WHERE slip_id=?").get(slipId).c;
-  db.prepare("UPDATE bet_slips SET match_count=? WHERE id=?").run(count,slipId);
+  const {match,market,selection,odd}=req.body||{};
+  if(!match||!market||!selection||!(Number(odd)>0)) return res.status(400).json({error:"Match, market, selection and valid odd are required"});
+  const info=db.prepare("INSERT INTO picks (slip_id,match,market,selection,odd) VALUES (?,?,?,?,?)").run(slipId,String(match).trim(),String(market).trim(),String(selection).trim(),Number(odd));
+  const count=db.prepare("SELECT COUNT(*) c FROM picks WHERE slip_id=?").get(slipId).c;
+  db.prepare("UPDATE slips SET match_count=? WHERE id=?").run(count,slipId);
   res.json({ok:true,id:info.lastInsertRowid});
 });
-app.delete("/api/admin/slips/:id/picks/:pickId", auth, admin, (req,res)=>{
+app.delete("/api/admin/slips/:id/picks/:pickId", requireAuth, requireAdmin, (req,res)=>{
   const slipId=Number(req.params.id), pickId=Number(req.params.pickId);
-  const exists=db.prepare("SELECT id FROM slip_picks WHERE id=? AND slip_id=?").get(pickId,slipId);
+  const exists=db.prepare("SELECT id FROM picks WHERE id=? AND slip_id=?").get(pickId,slipId);
   if(!exists) return res.status(404).json({error:"Pick not found"});
-  db.prepare("DELETE FROM slip_picks WHERE id=? AND slip_id=?").run(pickId,slipId);
-  const count=db.prepare("SELECT COUNT(*) c FROM slip_picks WHERE slip_id=?").get(slipId).c;
-  db.prepare("UPDATE bet_slips SET match_count=? WHERE id=?").run(count,slipId);
+  db.prepare("DELETE FROM picks WHERE id=? AND slip_id=?").run(pickId,slipId);
+  const count=db.prepare("SELECT COUNT(*) c FROM picks WHERE slip_id=?").get(slipId).c;
+  db.prepare("UPDATE slips SET match_count=? WHERE id=?").run(count,slipId);
   res.json({ok:true});
 });
-app.post("/api/admin/slips/:id/update", auth, admin, (req,res)=>{
+app.post("/api/admin/slips/:id/update", requireAuth, requireAdmin, (req,res)=>{
   const id=Number(req.params.id);
   const {title,league,description,odds,price_tzs,active}=req.body||{};
-  const exists=db.prepare("SELECT id FROM bet_slips WHERE id=?").get(id);
+  const exists=db.prepare("SELECT id FROM slips WHERE id=?").get(id);
   if(!exists) return res.status(404).json({error:"Slip not found"});
-  if(!String(title||"").trim() || !String(league||"").trim() || !(Number(odds)>0) || !(Number(price_tzs)>=0))
-    return res.status(400).json({error:"Title, league, odds and price are required"});
-  db.prepare("UPDATE bet_slips SET title=?,league=?,description=?,odds=?,price_tzs=?,status=? WHERE id=?")
-    .run(String(title).trim(),String(league).trim(),String(description||"").trim(),Number(odds),Number(price_tzs),active?"active":"hidden",id);
+  if(!title||!league||!(Number(odds)>0)||!(Number(price_tzs)>=0)) return res.status(400).json({error:"Title, league, odds and price are required"});
+  db.prepare("UPDATE slips SET title=?,league=?,description=?,odds=?,price_tzs=?,active=? WHERE id=?").run(String(title).trim(),String(league).trim(),String(description||"").trim(),Number(odds),Number(price_tzs),active?1:0,id);
   res.json({ok:true});
 });
 
