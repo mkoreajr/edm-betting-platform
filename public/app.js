@@ -47,7 +47,7 @@ async function homePage(){
    </div>
 
    <div class="dash-stats">
-    <div class="dash-stat card"><div class="dash-stat-icon">◈</div><div><span>PREMIUM SLIPS</span><b>${s.slips.length}</b><small>Available today</small></div></div>
+    <div class="dash-stat card"><div class="dash-stat-icon">▣</div><div><span>PREMIUM SLIPS</span><b>${s.slips.length}</b><small>Available today</small></div></div>
     <div class="dash-stat card"><div class="dash-stat-icon">✓</div><div><span>ACCOUNT</span><b>ACTIVE</b><small>Secure member access</small></div></div>
     <div class="dash-stat card"><div class="dash-stat-icon">⚡</div><div><span>EDM ACCESS</span><b>24/7</b><small>Browse anytime</small></div></div>
    </div>
@@ -74,10 +74,21 @@ async function homePage(){
    </section>
 
    <section class="dash-section dash-bottom">
-    <div class="card quick-card"><div class="quick-icon">▣</div><div><h3>My Purchases</h3><p>Open your verified premium slips and references.</p></div><button class="ghost" onclick="go('purchases')">OPEN →</button></div>
-    <div class="card quick-card"><div class="quick-icon">◉</div><div><h3>Secure by design</h3><p>Picks and slip codes remain server-side until payment is verified.</p></div></div>
+    <div class="card quick-card"><div class="quick-icon purchase-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6zM14 3v4h4M9 12h6M9 16h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h3>My Purchases</h3><p>Open your verified premium slips and references.</p></div><button class="ghost" onclick="go('purchases')">OPEN →</button></div>
+    <div class="card quick-card"><div class="quick-icon security-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.7-2.8 8.2-7 10-4.2-1.8-7-5.3-7-10V6zM9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h3>Secure by design</h3><p>Picks and slip codes remain server-side until payment is verified.</p></div></div>
    </section>
   </div>
+
+  <footer class="site-footer">
+   <div class="container footer-grid">
+    <div class="footer-brand"><div class="footer-logo">EDM</div><div class="footer-sub">BETTING PLATFORM</div><div class="footer-tag">Predict • Play • Win</div><p>Premium football picks, featured fixtures and secure access to the EDM betting platform.</p></div>
+    <div class="footer-col"><h4>Quick Links</h4><button onclick="go('home')">Home</button><button onclick="go('slips')">Premium Picks</button><button onclick="go('purchases')">My Purchases</button><button onclick="go('home')">Account</button><button onclick="go('home')">Support</button></div>
+    <div class="footer-col"><h4>Legal</h4><button>Terms of Service</button><button>Privacy Policy</button><button>Responsible Betting</button><button>Contact Us</button></div>
+    <div class="footer-col footer-follow"><h4>Follow Us</h4><div class="socials"><a aria-label="WhatsApp">WA</a><a aria-label="Telegram">TG</a><a aria-label="Instagram">IG</a><a aria-label="X">X</a><a aria-label="YouTube">YT</a></div></div>
+    <div class="footer-col footer-news"><h4>Stay Updated</h4><p>Get the latest fixtures, tips and offers.</p><div class="subscribe"><input type="email" placeholder="Your email address"><button class="green-btn">Subscribe</button></div></div>
+   </div>
+   <div class="container footer-bottom"><span>© 2026 EDM Betting Platform. All rights reserved.</span><strong>HATUNA NAMNA, HATUNA MADUKA.</strong><span>18+ &nbsp;|&nbsp; Bet Responsibly &nbsp;|&nbsp; Play Smart</span></div>
+  </footer>
  </div>`;
 }
 function slipCard(s){return `<div class="card slip"><span class="badge">PREMIUM</span><h3>${s.title}</h3><div class="muted">${s.league} • ${s.match_count} selections</div><div class="price">${money(s.price_tzs)} <small>• total odds ${s.odds}</small></div><p class="muted">${s.description}</p><div class="locked">🔒 Picks & slip code are protected until payment.</div><button class="green-btn" style="margin-top:14px" onclick="buy(${s.id})">VIEW & UNLOCK</button></div>`}
