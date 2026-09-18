@@ -457,7 +457,44 @@ function purchaseCard(p){
   </article>`;
 }
 
-async function adminPage(){
+async 
+function adminSection(section){
+  document.querySelectorAll(".admin-tab").forEach(b=>b.classList.toggle("active",b.dataset.section===section));
+  const body=document.querySelector("#admin-section-body");
+  if(!body)return;
+  if(section==="users") return adminUsers(body);
+  if(section==="payments") return adminPayments(body);
+  if(section==="purchases") return adminPurchases(body);
+}
+async function adminUsers(body){
+  body.innerHTML='<div class="admin-loading">Loading members…</div>';
+  try{
+    const rows=await api("/api/admin/users");
+    body.innerHTML=`<div class="admin-section-title"><span>MEMBERS</span><small>${rows.length} registered users</small></div>
+      <div class="admin-scroll"><table class="admin-table"><thead><tr><th>USER</th><th>EMAIL</th><th>ROLE</th><th>PURCHASES</th><th>SPEND</th><th>JOINED</th></tr></thead><tbody>
+      ${rows.map(u=>`<tr><td><b>${escapeHtml(u.name||"Member")}</b></td><td>${escapeHtml(u.email)}</td><td><span class="status-chip ${u.role==="admin"?"admin":"verified"}">${escapeHtml(u.role)}</span></td><td>${u.purchases_count}</td><td>${Number(u.spend_tzs||0).toLocaleString()} TZS</td><td>${escapeHtml(String(u.created_at||"").slice(0,16))}</td></tr>`).join("")}</tbody></table></div>`;
+  }catch(e){body.innerHTML=`<div class="error">${escapeHtml(e.message)}</div>`}
+}
+async function adminPayments(body){
+  body.innerHTML='<div class="admin-loading">Loading payments…</div>';
+  try{
+    const rows=await api("/api/admin/payments");
+    body.innerHTML=`<div class="admin-section-title"><span>PAYMENT ACTIVITY</span><small>Latest 100 transactions</small></div>
+      <div class="admin-scroll"><table class="admin-table"><thead><tr><th>DATE</th><th>MEMBER</th><th>SLIP</th><th>PROVIDER</th><th>PHONE</th><th>AMOUNT</th><th>STATUS</th><th>REFERENCE</th></tr></thead><tbody>
+      ${rows.map(p=>`<tr><td>${escapeHtml(String(p.created_at||"").slice(0,16))}</td><td>${escapeHtml(p.user_email||"—")}</td><td>${escapeHtml(p.slip_title||"—")}</td><td>${escapeHtml(p.provider||"—")}</td><td>${escapeHtml(p.phone||"—")}</td><td>${Number(p.amount_tzs||0).toLocaleString()} TZS</td><td><span class="status-chip ${p.status==="paid"||p.status==="verified"?"verified":"pending"}">${escapeHtml(p.status||"pending")}</span></td><td>${escapeHtml(p.reference||"—")}</td></tr>`).join("")||`<tr><td colspan="8">No payments yet.</td></tr>`}</tbody></table></div>`;
+  }catch(e){body.innerHTML=`<div class="error">${escapeHtml(e.message)}</div>`}
+}
+async function adminPurchases(body){
+  body.innerHTML='<div class="admin-loading">Loading purchases…</div>';
+  try{
+    const rows=await api("/api/admin/purchases");
+    body.innerHTML=`<div class="admin-section-title"><span>PURCHASES</span><small>Latest 100 purchases</small></div>
+      <div class="admin-scroll"><table class="admin-table"><thead><tr><th>DATE</th><th>MEMBER</th><th>SLIP</th><th>LEAGUE</th><th>AMOUNT</th><th>VERIFIED</th></tr></thead><tbody>
+      ${rows.map(p=>`<tr><td>${escapeHtml(String(p.created_at||"").slice(0,16))}</td><td>${escapeHtml(p.user_email||"—")}</td><td>${escapeHtml(p.slip_title||"—")}</td><td>${escapeHtml(p.league||"—")}</td><td>${Number(p.amount_tzs||0).toLocaleString()} TZS</td><td><span class="status-chip ${p.verified?"verified":"pending"}">${p.verified?"VERIFIED":"PENDING"}</span></td></tr>`).join("")||`<tr><td colspan="6">No purchases yet.</td></tr>`}</tbody></table></div>`;
+  }catch(e){body.innerHTML=`<div class="error">${escapeHtml(e.message)}</div>`}
+}
+
+function adminPage(){
   const d=await api("/api/admin/overview");
   const slips=d.slips||[], users=d.users||[], payments=d.payments||[], purchases=d.purchases||[];
   app.innerHTML=`<div class="admin-page-v17"><div class="container">

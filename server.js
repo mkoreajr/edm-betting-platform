@@ -281,5 +281,40 @@ app.post("/api/admin/slips/:id/update", auth, admin, (req,res)=>{
   res.json({ok:true});
 });
 
+
+app.get("/api/admin/users", auth, admin, (req,res)=>{
+  const users=db.prepare(`
+    SELECT u.id,u.name,u.email,u.role,u.created_at,
+      (SELECT COUNT(*) FROM purchases p WHERE p.user_id=u.id) AS purchases_count,
+      (SELECT COALESCE(SUM(p.amount_tzs),0) FROM purchases p WHERE p.user_id=u.id) AS spend_tzs
+    FROM users u ORDER BY u.id DESC
+  `).all();
+  res.json(users);
+});
+
+app.get("/api/admin/payments", auth, admin, (req,res)=>{
+  const rows=db.prepare(`
+    SELECT pay.id,pay.provider,pay.phone,pay.amount_tzs,pay.status,pay.reference,pay.created_at,
+      u.email AS user_email, s.title AS slip_title
+    FROM payments pay
+    LEFT JOIN users u ON u.id=pay.user_id
+    LEFT JOIN bet_slips s ON s.id=pay.slip_id
+    ORDER BY pay.id DESC LIMIT 100
+  `).all();
+  res.json(rows);
+});
+
+app.get("/api/admin/purchases", auth, admin, (req,res)=>{
+  const rows=db.prepare(`
+    SELECT p.id,p.amount_tzs,p.created_at,p.verified,
+      u.email AS user_email,s.title AS slip_title,s.league
+    FROM purchases p
+    LEFT JOIN users u ON u.id=p.user_id
+    LEFT JOIN bet_slips s ON s.id=p.slip_id
+    ORDER BY p.id DESC LIMIT 100
+  `).all();
+  res.json(rows);
+});
+
 app.use((req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
 app.listen(PORT,()=>console.log(`EDM running on http://localhost:${PORT}`));
