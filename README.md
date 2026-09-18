@@ -61,3 +61,5 @@ Admin v21: added Users, Payments and Purchases admin activity endpoints and tabb
 Admin v22: fixed blank-page issue caused by an accidental standalone `async` token in public/app.js. Verified app.js and server.js with node --check.
 
 Admin v23: fixed second frontend syntax issue: adminPage now correctly declared async. app.js and server.js pass node --check.
+
+Admin v24: Railway was running Node 24.20.0 and the better-sqlite3 native addon aborted with a V8 RemoveEnvironmentCleanupHook assertion. This package pins the runtime to Node 22.x (22.16.0) via package engines and .node-version, forcing a compatible native-module rebuild.
