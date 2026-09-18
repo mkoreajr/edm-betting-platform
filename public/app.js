@@ -467,13 +467,27 @@ function adminSection(section){
   if(section==="purchases") return adminPurchases(body);
 }
 
+async function adminUserDetail(id){
+  try{
+    const d=await api(`/api/admin/users/${id}`);
+    const u=d.user,p=d.purchases||[];
+    openModal(`<div class="admin-user-detail-v27">
+      <div class="eyebrow">MEMBER PROFILE</div><h2>${escapeHtml(u.name||"EDM Member")}</h2>
+      <div class="member-email-v27">${escapeHtml(u.email)}</div>
+      <div class="member-meta-v27"><span>${escapeHtml(u.role||"member")}</span><span>Joined ${escapeHtml(String(u.created_at||"").slice(0,10))}</span></div>
+      <div class="detail-label">PURCHASE HISTORY</div>
+      <div class="editor-picks-list">${p.map(x=>`<div class="editor-pick-row"><span class="editor-pick-no">#${x.id}</span><div><b>${escapeHtml(x.slip_title||"Premium Slip")}</b><small>${escapeHtml(x.league||"")} • ${escapeHtml(x.provider||"Mobile Money")} • ${escapeHtml(x.status||"pending")}</small></div><strong>${money(x.amount_tzs||0)}</strong></div>`).join("")||`<div class="admin-empty-v17">No purchases yet.</div>`}</div>
+    </div>`);
+  }catch(e){openModal(`<div class="error">${escapeHtml(e.message)}</div>`)}
+}
+
 async function adminUsers(body){
   body.innerHTML='<div class="admin-loading">Loading members…</div>';
   try{
     const rows=await api("/api/admin/users");
     body.innerHTML=`<div class="admin-section-title"><span>MEMBERS</span><small>${rows.length} registered users</small></div>
       <div class="admin-scroll"><table class="admin-table"><thead><tr><th>USER</th><th>EMAIL</th><th>ROLE</th><th>PURCHASES</th><th>SPEND</th><th>JOINED</th></tr></thead><tbody>
-      ${rows.map(u=>`<tr><td><b>${escapeHtml(u.name||"Member")}</b></td><td>${escapeHtml(u.email)}</td><td><span class="status-chip ${u.role==="admin"?"admin":"verified"}">${escapeHtml(u.role)}</span></td><td>${u.purchases_count}</td><td>${Number(u.spend_tzs||0).toLocaleString()} TZS</td><td>${escapeHtml(String(u.created_at||"").slice(0,16))}</td></tr>`).join("")}</tbody></table></div>`;
+      ${rows.map(u=>`<tr class="admin-click-row" onclick="adminUserDetail(${u.id})"><td><b>${escapeHtml(u.name||"Member")}</b></td><td>${escapeHtml(u.email)}</td><td><span class="status-chip ${u.role==="admin"?"admin":"verified"}">${escapeHtml(u.role)}</span></td><td>${u.purchases_count}</td><td>${Number(u.spend_tzs||0).toLocaleString()} TZS</td><td>${escapeHtml(String(u.created_at||"").slice(0,16))}</td></tr>`).join("")}</tbody></table></div>`;
   }catch(e){body.innerHTML=`<div class="error">${escapeHtml(e.message)}</div>`}
 }
 async function adminPayments(body){
@@ -505,6 +519,7 @@ async function adminPage(){
       api("/api/admin/purchases")
     ]);
     const slips=slipData.slips||[], users=userRows||[], payments=paymentRows||[], purchases=purchaseRows||[];
+    const totalRevenue=purchases.reduce((sum,p)=>sum+Number(p.amount_tzs||0),0);
     app.innerHTML=`<div class="admin-page-v17"><div class="container">
       <section class="admin-hero-v17">
         <div><div class="eyebrow">EDM CONTROL CENTER</div><h1>Admin <span>Dashboard</span></h1><p>Manage premium slips, members, payments and purchases.</p></div>
@@ -515,6 +530,7 @@ async function adminPage(){
         <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.user}</span><small>MEMBERS</small><b>${users.length}</b><em>Registered users</em></div>
         <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.payment}</span><small>PAYMENTS</small><b>${payments.length}</b><em>Latest activity</em></div>
         <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.check}</span><small>PURCHASES</small><b>${purchases.length}</b><em>Recorded purchases</em></div>
+        <div class="card admin-stat-v17"><span class="admin-stat-icon">${icons.payment}</span><small>REVENUE</small><b>${money(totalRevenue)}</b><em>Recorded TZS</em></div>
       </section>
       <div class="admin-tabs-v25">
         <button class="admin-tab-v25 active" data-section="slips" onclick="adminSection('slips')">Premium Slips</button>

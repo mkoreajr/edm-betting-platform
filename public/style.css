@@ -503,3 +503,7 @@
 /* Admin dashboard stability/UI v25 */
 .admin-tabs-v25{display:flex;gap:7px;flex-wrap:wrap;margin:18px 0 12px}.admin-tab-v25{border:1px solid #153b25;background:#06100a;color:#71887d;border-radius:7px;padding:9px 13px;font-size:9px;font-weight:900;letter-spacing:.5px;cursor:pointer}.admin-tab-v25.active{background:#0c2b17;color:#18ed68;border-color:#18ed68}.admin-section-body-v25{min-width:0}.admin-fatal-v25{margin:60px auto;max-width:600px;text-align:center;padding:30px;border:1px solid #3a2020;background:#100707;border-radius:12px;color:#dca0a0}.admin-fatal-v25 .green-btn{margin-top:15px}
 @media(max-width:700px){.admin-tabs-v25{overflow:auto;flex-wrap:nowrap}.admin-tab-v25{white-space:nowrap}}
+
+/* Admin full control v27 */
+.admin-click-row{cursor:pointer}.admin-click-row:hover td{background:#07180d}.admin-user-detail-v27{min-width:min(620px,88vw)}.member-email-v27{color:#8fa79a;font-size:11px;margin:6px 0 10px}.member-meta-v27{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.member-meta-v27 span{font-size:8px;color:#18ed68;border:1px solid #16562d;background:#082312;padding:5px 7px;border-radius:999px}
+@media(max-width:650px){.admin-user-detail-v27{min-width:0}}

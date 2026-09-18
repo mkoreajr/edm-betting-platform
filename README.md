@@ -67,3 +67,5 @@ Admin v24: Railway was running Node 24.20.0 and the better-sqlite3 native addon 
 Admin v25: fixed dashboard data-shape bug (overview counts were treated as arrays), fixed slip status action to PATCH status, and added stable Users/Payments/Purchases tabs with loading/error handling.
 
 Admin v26: fixed Request failed caused by querying nonexistent payments table and nonexistent purchases.verified column. Admin payments now reads the existing purchases table; purchases use status/paid_at/reference fields.
+
+Admin v27: added member detail view with purchase history and a revenue summary card; user endpoint is admin-only and read-only.

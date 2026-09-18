@@ -316,5 +316,19 @@ app.get("/api/admin/purchases", auth, admin, (req,res)=>{
   res.json(rows);
 });
 
+
+app.get("/api/admin/users/:id", auth, admin, (req,res)=>{
+  const id=Number(req.params.id);
+  const user=db.prepare("SELECT id,name,email,role,created_at FROM users WHERE id=?").get(id);
+  if(!user) return res.status(404).json({error:"User not found"});
+  const purchases=db.prepare(`
+    SELECT p.id,p.amount_tzs,p.provider,p.reference,p.status,p.paid_at,p.created_at,
+      s.title AS slip_title,s.league
+    FROM purchases p LEFT JOIN bet_slips s ON s.id=p.slip_id
+    WHERE p.user_id=? ORDER BY p.id DESC LIMIT 50
+  `).all(id);
+  res.json({user,purchases});
+});
+
 app.use((req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
 app.listen(PORT,()=>console.log(`EDM running on http://localhost:${PORT}`));
