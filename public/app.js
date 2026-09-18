@@ -112,14 +112,7 @@ async function homePage(){
        <a class="social youtube" aria-label="YouTube" href="#" onclick="return false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 7.2a2.7 2.7 0 0 0-1.9-1.9C17.4 4.8 12 4.8 12 4.8s-5.4 0-7.1.5A2.7 2.7 0 0 0 3 7.2 28 28 0 0 0 2.5 12 28 28 0 0 0 3 16.8a2.7 2.7 0 0 0 1.9 1.9c1.7.5 7.1.5 7.1.5s5.4 0 7.1-.5a2.7 2.7 0 0 0 1.9-1.9 28 28 0 0 0 .5-4.8 28 28 0 0 0-.5-4.8Z" fill="currentColor"/><path d="m10 15.5 5-3.5-5-3.5v7Z" fill="#04110a"/></svg></a>
       </div>
     </section>
-    <section class="footer-news-panel">
-      <h4>Stay Updated</h4>
-      <p>Get the latest fixtures, tips and offers.</p>
-      <div class="subscribe">
-       <div class="email-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.8" y="5" width="18.4" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><input type="email" placeholder="Your email address" aria-label="Your email address"></div>
-       <button class="subscribe-btn" type="button">Subscribe</button>
-      </div>
-    </section>
+
    </div>
    <div class="container footer-bottom"><span>© 2024 EDM Betting Platform. All rights reserved.</span><strong>HATUNA NAMNA, HATUNA MADUKA.</strong><span>18+ &nbsp;|&nbsp; Bet Responsibly &nbsp;|&nbsp; Play Smart</span></div>
   </footer>
