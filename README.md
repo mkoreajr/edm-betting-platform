@@ -51,3 +51,5 @@ UI v15: My Purchases page redesigned with verified purchase cards, payment/date 
 UI v16: Member Account page redesigned with profile information, verified status, purchase summary, security panel, and account actions.
 
 UI v17: Admin Control Center redesigned with stats, premium slip management, activate/hide controls, payment activity, recent members, and add-slip modal.
+
+Admin v18: admins can edit slip details and add/remove match picks with market, selection and odds. Pick count syncs automatically.

@@ -476,7 +476,7 @@ async function adminPage(){
     <section class="admin-section-v17">
       <div class="admin-section-head-v17"><div><span class="detail-label">PREMIUM CATALOG</span><h2>Manage Bet Slips</h2></div><button class="green-btn admin-add-btn-v17" onclick="adminNewSlip()">+ ADD PREMIUM SLIP</button></div>
       <div class="admin-table-wrap-v17 card"><table class="admin-table-v17"><thead><tr><th>SLIP</th><th>LEAGUE</th><th>PICKS</th><th>ODDS</th><th>PRICE</th><th>STATUS</th><th>ACTION</th></tr></thead>
-      <tbody>${slips.map(s=>`<tr><td><b>${s.title}</b></td><td>${s.league}</td><td>${s.match_count}</td><td>${s.odds}</td><td>${money(s.price_tzs)} TZS</td><td><span class="admin-status ${s.active?"on":"off"}">${s.active?"ACTIVE":"HIDDEN"}</span></td><td><button class="table-btn" onclick="adminToggleSlip(${s.id},${s.active?0:1})">${s.active?"HIDE":"ACTIVATE"}</button></td></tr>`).join("")||`<tr><td colspan="7" class="admin-empty-cell">No premium slips found.</td></tr>`}</tbody></table></div>
+      <tbody>${slips.map(s=>`<tr><td><b>${s.title}</b></td><td>${s.league}</td><td>${s.match_count}</td><td>${s.odds}</td><td>${money(s.price_tzs)} TZS</td><td><span class="admin-status ${s.active?"on":"off"}">${s.active?"ACTIVE":"HIDDEN"}</span></td><td><div class="admin-table-actions"><button class="table-btn" onclick="adminEditSlip(${s.id})">EDIT</button><button class="table-btn" onclick="adminToggleSlip(${s.id},${s.active?0:1})">${s.active?"HIDE":"ACTIVATE"}</button></div></td></tr>`).join("")||`<tr><td colspan="7" class="admin-empty-cell">No premium slips found.</td></tr>`}</tbody></table></div>
     </section>
 
     <section class="admin-two-col-v17">
@@ -495,6 +495,55 @@ async function adminPage(){
 }
 async function adminToggleSlip(id,active){
   try{await api(`/api/admin/slips/${id}/status`,{method:"POST",body:JSON.stringify({active:!!active})});await adminPage()}catch(e){openModal(`<div class="error">${e.message}</div>`)}
+}
+async function adminEditSlip(id){
+  try{
+    const d=await api(`/api/admin/slips/${id}/picks`);
+    const s=d.slip,picks=d.picks||[];
+    openModal(`<div class="admin-editor-v18">
+      <div class="eyebrow">PREMIUM CATALOG</div><h2>Edit Premium Slip</h2>
+      <div class="admin-form-row"><input class="input" id="eTitle" value="${escAttr(s.title)}" placeholder="Slip title"><input class="input" id="eLeague" value="${escAttr(s.league)}" placeholder="League"></div>
+      <input class="input" id="eDesc" value="${escAttr(s.description||"")}" placeholder="Description">
+      <div class="admin-form-row"><input class="input" id="eOdds" type="number" step="0.01" value="${s.odds}" placeholder="Total odds"><input class="input" id="ePrice" type="number" value="${s.price_tzs}" placeholder="Price TZS"></div>
+      <label class="editor-check"><input type="checkbox" id="eActive" ${s.active?"checked":""}> <span>Slip active / visible to members</span></label>
+      <button class="green-btn" onclick="adminSaveSlip(${id})">SAVE SLIP DETAILS</button>
+      <div class="editor-picks-head"><span class="detail-label">MATCH PICKS (${picks.length})</span><button class="table-btn" onclick="adminAddPick(${id})">+ ADD PICK</button></div>
+      <div class="editor-picks-list">${picks.map((p,i)=>`<div class="editor-pick-row"><span class="editor-pick-no">${String(i+1).padStart(2,"0")}</span><div><b>${escapeHtml(p.match)}</b><small>${escapeHtml(p.market)} • ${escapeHtml(p.selection)}</small></div><strong>${p.odd}</strong><button class="delete-pick" onclick="adminDeletePick(${id},${p.id} )">×</button></div>`).join("")||`<div class="admin-empty-v17">No picks yet.</div>`}</div>
+    </div>`);
+  }catch(e){openModal(`<div class="error">${e.message}</div>`)}
+}
+function escAttr(v){return String(v??"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function escapeHtml(v){return escAttr(v)}
+async function adminSaveSlip(id){
+  try{
+    await api(`/api/admin/slips/${id}/update`,{method:"POST",body:JSON.stringify({
+      title:document.querySelector("#eTitle").value.trim(),league:document.querySelector("#eLeague").value.trim(),
+      description:document.querySelector("#eDesc").value.trim(),odds:Number(document.querySelector("#eOdds").value),
+      price_tzs:Number(document.querySelector("#ePrice").value),active:document.querySelector("#eActive").checked
+    })});
+    await adminEditSlip(id);
+  }catch(e){modalBody.innerHTML+=`<div class="error">${e.message}</div>`}
+}
+function adminAddPick(id){
+  modalBody.insertAdjacentHTML("beforeend",`<div class="add-pick-box">
+    <div class="detail-label">NEW MATCH PICK</div>
+    <input class="input" id="pMatch" placeholder="e.g. Bayern Munich vs Dortmund">
+    <div class="admin-form-row"><input class="input" id="pMarket" placeholder="Market e.g. Over 2.5"><input class="input" id="pSelection" placeholder="Selection e.g. Over 2.5"></div>
+    <input class="input" id="pOdd" type="number" step="0.01" placeholder="Odd">
+    <button class="green-btn" onclick="adminSavePick(${id})">ADD PICK</button>
+  </div>`);
+}
+async function adminSavePick(id){
+  try{
+    await api(`/api/admin/slips/${id}/picks`,{method:"POST",body:JSON.stringify({
+      match:document.querySelector("#pMatch").value.trim(),market:document.querySelector("#pMarket").value.trim(),selection:document.querySelector("#pSelection").value.trim(),odd:Number(document.querySelector("#pOdd").value)
+    })});
+    await adminEditSlip(id);
+  }catch(e){modalBody.innerHTML+=`<div class="error">${e.message}</div>`}
+}
+async function adminDeletePick(id,pickId){
+  if(!confirm("Remove this pick from the slip?")) return;
+  try{await api(`/api/admin/slips/${id}/picks/${pickId}`,{method:"DELETE"});await adminEditSlip(id)}catch(e){modalBody.innerHTML+=`<div class="error">${e.message}</div>`}
 }
 function adminNewSlip(){
   openModal(`<div class="admin-form-v17"><div class="eyebrow">PREMIUM CATALOG</div><h2>Add Premium Slip</h2>
